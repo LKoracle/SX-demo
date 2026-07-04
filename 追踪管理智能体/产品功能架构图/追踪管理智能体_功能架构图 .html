@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>追踪管理智能体 · 功能架构图</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;background:#EEECEA;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:40px 20px;}
+.page{width:1100px;background:#fff;border-radius:12px;box-shadow:0 4px 28px rgba(0,0,0,.10);padding:40px 44px 32px;}
+
+.main-title{text-align:center;font-size:24px;font-weight:700;color:#222;letter-spacing:3px;}
+.sub-title{text-align:center;font-size:11px;color:#aaa;margin-top:4px;margin-bottom:28px;}
+
+.wrap{display:flex;gap:16px;}
+
+/* 左侧栏 */
+.side{width:130px;flex-shrink:0;display:flex;flex-direction:column;gap:14px;}
+.side-box{border:1px solid #E0DFD9;border-radius:8px;padding:14px 12px;background:transparent;}
+.side-box-title{font-size:12px;font-weight:700;color:#5C6BC0;padding-bottom:6px;border-bottom:2px solid #EDEDEA;margin-bottom:8px;}
+.side-box .nav-item{font-size:11px;color:#888;line-height:2.1;cursor:default;border-bottom:1px solid #F0EFEC;padding-bottom:1px;}
+.side-box .nav-item:last-child{border-bottom:none;}
+
+.main{flex:1;min-width:0;}
+.arrow{text-align:center;margin:6px 0;line-height:0;}
+
+/* 层标题（线框内部） */
+.layer-label{font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.layer-label .float-note{font-size:10px;font-weight:400;color:#bbb;}
+.tech-tag{display:inline-block;font-size:10px;font-weight:600;padding:3px 12px;border-radius:20px;border:1px solid;margin-left:6px;}
+.tech-tag.tag-purple{color:#7B6CF0;border-color:#D5D0F0;background:#EBE7FB;}
+.tech-tag.tag-green{color:#00B894;border-color:#D4EDDF;background:#E3F7EF;}
+
+/* ===== 交互层 ===== 蓝紫色标题+填充，顶部蓝紫阴影 */
+.layer-interact{border:1px solid #7986CB;border-radius:10px;padding:16px 20px 18px;background:transparent;box-shadow:0 -4px 12px rgba(92,107,192,.15);}
+.layer-interact .layer-label{color:#5C6BC0;}
+.interact-bar{background:linear-gradient(135deg,#5C6BC0 0%,#7986CB 40%,#9FA8DA 100%);color:#fff;text-align:center;padding:14px 20px;border-radius:8px;font-size:14px;font-weight:500;letter-spacing:1px;box-shadow:0 2px 8px rgba(92,107,192,.22);}
+
+/* ===== Agent应用层 ===== 标题紫色，浅紫底色，顶部紫色阴影 */
+.layer-agent{border:1px solid #E2DFF5;border-radius:10px;padding:16px 20px 18px;background:#FAF8FF;box-shadow:0 -4px 12px rgba(123,108,240,.12);}
+.layer-agent .layer-label{color:#7B6CF0;}
+.agent-two-col{display:flex;gap:14px;margin-top:8px;align-items:flex-start;}
+.agent-col{flex:1;min-width:0;display:flex;flex-direction:column;}
+
+/* 面谈辅助 / 业绩追踪 标题线框 */
+.func-title-box{border-radius:8px;padding:10px 14px;font-size:12.5px;font-weight:700;color:#fff;letter-spacing:.3px;margin-bottom:8px;text-align:center;}
+.func-title-box .sep{color:rgba(255,255,255,.5);margin:0 2px;}
+.func-title-box.bg-purple{background:linear-gradient(135deg,#6C5CE7,#7B6CF0);border:none;}
+.func-title-box.bg-pink{background:linear-gradient(135deg,#C084E8,#D9A8F5);border:none;}
+
+.skills-label{font-size:11px;color:#7B6CF0;margin-bottom:8px;margin-top:2px;}
+
+/* 统一4列卡片网格 */
+.skill-unified-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px;}
+.skill-card{border:1px solid #EDEDEA;border-radius:8px;padding:10px 12px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.04);display:flex;flex-direction:column;}
+.skill-card-head{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+.skill-tag{font-size:9px;padding:2px 8px;border-radius:3px;color:#fff;font-weight:700;white-space:nowrap;letter-spacing:.5px;}
+.st-red{background:#FF6B6B;}
+.st-purple{background:#A084F2;}
+.st-teal{background:#00B894;}
+.st-blue{background:#0984E3;}
+.st-amber{background:#F0932B;}
+.st-green{background:#27AE60;}
+.st-rose{background:#E84393;}
+.skill-prio{margin-left:auto;font-size:10px;font-weight:600;}
+.skill-prio.p0{color:#FF6B6B;}
+.skill-prio.p1{color:#F0932B;}
+.skill-prio.p2{color:#0984E3;}
+.skill-item{padding:2px 0;}
+.skill-item-name{font-size:11.5px;font-weight:700;color:#444;}
+.skill-item-desc{font-size:10px;color:#aaa;margin-top:1px;line-height:1.4;}
+.col-divider{width:1px;background:#EDEDEA;flex-shrink:0;}
+.priority-row{display:flex;justify-content:flex-end;gap:18px;margin-top:12px;font-size:11px;color:#aaa;}
+.prio-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle;}
+.pd0{background:#FF6B6B;}
+.pd1{background:#F0932B;}
+.pd2{background:#0984E3;}
+
+/* ===== 原子化工具层 ===== 标题绿色，浅绿底色，顶部绿色阴影 */
+.layer-tools{border:1px solid #D4EDDF;border-radius:10px;padding:16px 20px 18px;background:#F5FCF8;box-shadow:0 -4px 12px rgba(0,184,148,.12);}
+.layer-tools .layer-label{color:#00B894;}
+.tools-row{display:flex;gap:18px;margin-top:10px;}
+.tools-col{flex:1;border:1px solid #D4EDDF;border-radius:8px;padding:14px 14px 12px;background:#fff;}
+.tools-col-title{font-size:12px;font-weight:700;color:#00B894;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #E0F0E8;}
+.chips{display:flex;flex-wrap:wrap;gap:6px;}
+.chip{font-size:10.5px;padding:5px 12px;border-radius:6px;border:1px solid #D4EDDF;background:#F5FCF8;color:#555;box-shadow:0 1px 2px rgba(0,0,0,.03);cursor:default;}
+
+/* ===== 数据层 ===== 标题橘黄色，浅黄底色，顶部橘黄阴影 */
+.layer-data{border:1px solid #F0E4C8;border-radius:10px;padding:16px 20px 18px;background:#FFFDF7;box-shadow:0 -4px 12px rgba(225,112,85,.12);}
+.layer-data .layer-label{color:#E17055;}
+.data-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:10px;}
+.data-card{text-align:center;padding:18px 10px 14px;border-radius:10px;border:1px solid #EDEDEA;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+.data-icon{width:40px;height:40px;border-radius:50%;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.di1{background:#DBEAFE;color:#2563EB;}
+.di2{background:#FEF3C7;color:#D97706;}
+.di3{background:#D1FAE5;color:#059669;}
+.di4{background:#EDE9FE;color:#7C3AED;}
+.di5{background:#FCE7F3;color:#DB2777;}
+.data-name{font-size:12px;font-weight:700;color:#333;}
+.data-desc{font-size:9.5px;color:#aaa;margin-top:3px;line-height:1.5;}
+
+.footer{text-align:center;margin-top:20px;font-size:9px;color:#ccc;}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="main-title">追踪管理智能体 · 功能架构图</div>
+  <div class="sub-title">&nbsp;</div>
+
+  <div class="wrap">
+
+    <div class="side">
+      <div class="side-box">
+        <div class="side-box-title">智能体平台</div>
+        <div class="nav-item">智能体编排</div>
+        <div class="nav-item">工作流编排</div>
+        <div class="nav-item">技能与插件管理</div>
+        <div class="nav-item">记忆管理</div>
+      </div>
+      <div class="side-box">
+        <div class="side-box-title">事件驱动引擎</div>
+        <div class="nav-item">指标异动驱动</div>
+        <div class="nav-item">流程节点驱动</div>
+        <div class="nav-item">数据状态驱动</div>
+      </div>
+    </div>
+
+    <div class="main">
+
+      <!-- ===== 交互层 ===== -->
+      <div class="layer-interact">
+        <div class="layer-label">交互层</div>
+        <div class="interact-bar">平安DO · 追踪管理智能体（统一对话入口）</div>
+      </div>
+
+      <div class="arrow"><svg width="12" height="20" viewBox="0 0 12 20"><line x1="6" y1="0" x2="6" y2="12" stroke="#7B6CF0" stroke-width="2" stroke-dasharray="4,3"/><path d="M6 20 L1 12 L11 12 Z" fill="#7B6CF0"/></svg></div>
+
+      <!-- ===== Agent 应用层 ===== -->
+      <div class="layer-agent">
+        <div class="layer-label">Agent 应用层<span class="tech-tag tag-purple">= OpenClaw 实例</span></div>
+
+        <div class="agent-two-col">
+
+          <!-- 左列：面谈辅助 -->
+          <div class="agent-col">
+            <div class="func-title-box bg-purple">面谈辅助：精准筹备<span class="sep">、</span>高效执行<span class="sep">、</span>规范归档</div>
+          </div>
+          <div class="col-divider"></div>
+          <!-- 右列：业绩追踪 -->
+          <div class="agent-col">
+            <div class="func-title-box bg-pink">业绩追踪：实时监控<span class="sep">、</span>风险预警<span class="sep">、</span>根因诊断<span class="sep">、</span>策略干预</div>
+          </div>
+        </div>
+
+        <div class="skills-label">场景化 SKILLS（二级功能）</div>
+
+        <div class="skill-unified-grid">
+          <!-- Row 1: 面谈筹备 | 目标测算 | 过程追踪 | 风险预警与根因诊断 -->
+          <div class="skill-card">
+            <div class="skill-card-head">
+              <span class="skill-tag st-red">面谈筹备</span>
+              <span class="skill-prio p0">P0</span>
+            </div>
+            <div class="skill-item"><div class="skill-item-name">圈定待面谈名单</div><div class="skill-item-desc">从总公司下发客户名单中精准圈定重点面谈代理人对象</div></div>
+            <div class="skill-item"><div class="skill-item-name">生成代理人画像</div><div class="skill-item-desc">聚合代理人过往业绩、客户储备、历史面谈档案</div></div>
+          </div>
+
+          <div class="skill-card">
+            <div class="skill-card-head">
+              <span class="skill-tag st-amber">目标测算</span>
+              <span class="skill-prio p2">P2</span>
+            </div>
+            <div class="skill-item"><div class="skill-item-name">测算代理人目标值</div><div class="skill-item-desc">基于代理人过往业绩、总部下发客户资源和主推产品，智能测算目标值</div></div>
+          </div>
+
+          <div class="skill-card">
+            <div class="skill-card-head">
+              <span class="skill-tag st-blue">过程追踪</span>
+              <span class="skill-prio p0">P0</span>
+            </div>
+            <div class="skill-item"><div class="skill-item-name">实时指标追踪</div><div class="skill-item-desc">穿透追踪机构、区、部课的业绩、产能、客开和人力数据</div></div>
+            <div class="skill-item"><div class="skill-item-name">目标偏差诊断</div><div class="skill-item-desc">自动对比实际vs目标，判断经营健康度</div></div>
+          </div>
+
+          <div class="skill-card">
+            <div class="skill-card-head">
+              <span class="skill-tag st-amber">预警诊断</span>
+              <span class="skill-prio p1">P1</span>
+            </div>
+            <div class="skill-item"><div class="skill-item-name">触发自动化预警</div><div class="skill-item-desc">通过快乐平安主动提醒内勤</div></div>
+            <div class="skill-item"><div class="skill-item-name">指标下钻分析</div><div class="skill-item-desc">定位下滑原因：具体到营业部、产品线、指标</div></div>
+          </div>
+
+          <!-- Row 2: 面谈执行 | 面谈档案 | 策略干预(span 2) -->
+          <div class="skill-card">
+            <div class="skill-card-head">
+              <span class="skill-tag st-purple">面谈执行</span>
+              <span class="skill-prio p0">P0</span>
+            </div>
+            <div class="skill-item"><div class="skill-item-name">谈目标·盘客户·定行动</div><div class="skill-item-desc">面谈三步法核心流程，AI智能生成面谈话术辅助</div></div>
+            <div class="skill-item"><div class="skill-item-name">数字化面谈</div><div class="skill-item-desc">面谈信息数字化采集与存储，结构化沉淀目标值、意向客户、行动项</div></div>
+          </div>
+
+          <div class="skill-card">
+            <div class="skill-card-head">
+              <span class="skill-tag st-teal">面谈档案</span>
+              <span class="skill-prio p0">P0</span>
+            </div>
+            <div class="skill-item"><div class="skill-item-name">目标制定与同步</div><div class="skill-item-desc">制定面谈目标并存储，内勤平安DO与外勤口袋e双端同步</div></div>
+            <div class="skill-item"><div class="skill-item-name">面谈纪要归档</div><div class="skill-item-desc">数字化、结构化存储面谈话术与总结，持续优化AI面谈话术生成</div></div>
+          </div>
+
+          <div class="skill-card">
+            <div class="skill-card-head">
+              <span class="skill-tag st-green">策略干预</span>
+              <span class="skill-prio p2">P2</span>
+            </div>
+            <div class="skill-item"><div class="skill-item-name">匹配干预方案库</div><div class="skill-item-desc">智能检索同类场景的经营改善方案与最佳实践</div></div>
+            <div class="skill-item"><div class="skill-item-name">生成行动计划</div><div class="skill-item-desc">转化为可量化、可追踪的待办任务</div></div>
+          </div>
+        </div>
+
+        <div class="priority-row">
+          <span><span class="prio-dot pd0"></span>P0 最高优先级</span>
+          <span><span class="prio-dot pd1"></span>P1 高优先级</span>
+          <span><span class="prio-dot pd2"></span>P2 中优先级</span>
+        </div>
+      </div>
+
+      <div class="arrow"><svg width="12" height="20" viewBox="0 0 12 20"><line x1="6" y1="0" x2="6" y2="12" stroke="#00B894" stroke-width="2" stroke-dasharray="4,3"/><path d="M6 20 L1 12 L11 12 Z" fill="#00B894"/></svg></div>
+
+      <!-- ===== 原子化工具层 ===== -->
+      <div class="layer-tools">
+        <div class="layer-label">原子化工具层<span class="tech-tag tag-green">= MCP 工具</span></div>
+        <div class="tools-row">
+          <div class="tools-col">
+            <div class="tools-col-title">面谈辅助工具</div>
+            <div class="chips">
+              <span class="chip">面谈名单</span>
+              <span class="chip">代理人画像</span>
+              <span class="chip">目标测算</span>
+              <span class="chip">数字化面谈</span>
+              <span class="chip">目标制定</span>
+              <span class="chip">面谈档案</span>
+            </div>
+          </div>
+          <div class="tools-col">
+            <div class="tools-col-title">业绩追踪工具</div>
+            <div class="chips">
+              <span class="chip">指标追踪</span>
+              <span class="chip">偏差诊断</span>
+              <span class="chip">自动预警</span>
+              <span class="chip">根因分析</span>
+              <span class="chip">方案匹配</span>
+              <span class="chip">行动计划</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arrow"><svg width="12" height="20" viewBox="0 0 12 20"><line x1="6" y1="0" x2="6" y2="12" stroke="#E17055" stroke-width="2" stroke-dasharray="4,3"/><path d="M6 20 L1 12 L11 12 Z" fill="#E17055"/></svg></div>
+
+      <!-- ===== 数据层 ===== -->
+      <div class="layer-data">
+        <div class="layer-label">数据层</div>
+        <div class="data-grid">
+          <div class="data-card">
+            <div class="data-icon di1">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div class="data-name">代理人库</div>
+            <div class="data-desc">代理人档案、历史业绩<br>画像标签</div>
+          </div>
+          <div class="data-card">
+            <div class="data-icon di5">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+            </div>
+            <div class="data-name">客户资源库</div>
+            <div class="data-desc">客户档案、客温、客价<br>客群标签</div>
+          </div>
+          <div class="data-card">
+            <div class="data-icon di2">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            </div>
+            <div class="data-name">经营指标库</div>
+            <div class="data-desc">业绩指标、产能指标<br>客开指标、人力指标</div>
+          </div>
+          <div class="data-card">
+            <div class="data-icon di3">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+            </div>
+            <div class="data-name">面谈档案库</div>
+            <div class="data-desc">面谈记录、面谈总结<br>目标值、行动计划</div>
+          </div>
+          <div class="data-card">
+            <div class="data-icon di4">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+            </div>
+            <div class="data-name">干预方案库</div>
+            <div class="data-desc">历史案例<br>改善方案</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer">追踪管理智能体功能架构图 V1.0 · 平安人寿内勤系统平安DO · 2026年3月</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>万能营销 · DeerFlow 2.0 智能体系统拓扑图</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  background: #f8fafc;
+  color: #0f172a;
+  min-height: 100vh;
+  padding: 36px 24px 60px;
+}
+
+/* ── 标题区域 ── */
+.header-area {
+  max-width: 1100px;
+  margin: 0 auto 24px;
+  text-align: center;
+}
+.header-area h1 {
+  font-size: 24px;
+  color: #1e3a8a;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.header-area p {
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* ── 三栏：平安DO主控 | DeerFlow智能体总线与沙箱 | 口袋E执行端 ── */
+.river-wrap {
+  display: grid;
+  grid-template-columns: 1fr 220px 1fr;
+  max-width: 1100px;
+  margin: 0 auto;
+  gap: 0;
+  align-items: stretch;
+}
+
+/* ── DeerFlow 智能体核心总线 ── */
+.rv {
+  background: linear-gradient(180deg, #f0fdf4 0%, #dcfce7 100%);
+  border-left: 2px solid #86efac;
+  border-right: 2px solid #86efac;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+  position: relative;
+}
+.rv-title {
+  font-size: 11px;
+  font-weight: bold;
+  color: #166534;
+  background: #bbf7d0;
+  padding: 3px 8px;
+  border-radius: 12px;
+  text-align: center;
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.rv-core-box {
+  background: #ffffff;
+  border: 1px solid #86efac;
+  border-radius: 6px;
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 16px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(22,101,52,0.05);
+}
+.rv-core-title {
+  font-size: 11px;
+  font-weight: bold;
+  color: #15803d;
+  margin-bottom: 4px;
+}
+.rv-core-desc {
+  font-size: 9px;
+  color: #166534;
+  line-height: 1.3;
+}
+
+/* ── 左右两岸 ── */
+.lc, .rc {
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px;
+}
+.lc { align-items: flex-end; text-align: right; }
+.rc { align-items: flex-start; text-align: left; }
+
+/* ── 阶段行 ── */
+.stage-row {
+  display: contents;
+}
+.empty-cell { min-height: 50px; }
+
+/* ── 智能体卡片 ── */
+.card {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 14px;
+  width: 90%;
+  max-width: 380px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+  border: 1px solid #e2e8f0;
+  position: relative;
+  transition: all 0.2s;
+  margin-bottom: 20px;
+}
+.card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+}
+
+/* 终端/角色标签 */
+.card-meta {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  color: #64748b;
+}
+.lc .card-meta { color: #2563eb; } /* 内勤蓝色 */
+.rc .card-meta { color: #ea580c; } /* 外勤橙色 */
+
+.card-title {
+  font-size: 15px;
+  font-weight: bold;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+/* 输入/输出/工具样式 */
+.prop-group {
+  margin-top: 6px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.prop-label {
+  font-weight: bold;
+  color: #475569;
+  display: inline-block;
+  margin-right: 4px;
+}
+.prop-val { color: #334155; }
+
+/* Skills & Sandbox 特性标签 */
+.skill-badge {
+  display: inline-block;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin: 2px 2px 0 0;
+  border: 1px solid #e2e8f0;
+}
+.sandbox-badge {
+  display: inline-block;
+  background: #fff7ed;
+  color: #c2410c;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin: 2px 2px 0 0;
+  border: 1px solid #ffedd5;
+  font-weight: bold;
+}
+
+/* ── 串联连接线与箭头 ── */
+.r-seg {
+  width: 2px;
+  flex-grow: 1;
+  background: #bbf7d0;
+  min-height: 24px;
+  position: relative;
+}
+.r-seg::after {
+  content: "";
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 6px solid #166534;
+}
+.r-node {
+  background: #166534;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin: 4px 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  white-space: nowrap;
+}
+
+/* 信号互通横向指示 */
+.sig-to-river, .sig-from-river {
+  position: absolute;
+  top: 40px;
+  font-size: 11px;
+  font-weight: bold;
+  color: #16a34a;
+  white-space: nowrap;
+}
+.lc .sig-to-river { right: -24px; }
+.rc .sig-from-river { left: -24px; }
+
+/* 闭环回流板块 */
+.loop-section {
+  background: #ffffff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
+}
+.loop-title {
+  font-size: 12px;
+  font-weight: bold;
+  color: #0f172a;
+}
+.loop-desc {
+  font-size: 11px;
+  color: #64748b;
+  line-height: 1.4;
+}
+</style>
+</head>
+<body>
+
+<div class="header-area">
+  <h1>万能营销 · DeerFlow 2.0 智能体运行拓扑</h1>
+  <p>基于 SuperAgent Harness 架构：实现多智能体动态编排、全隔离安全沙箱计算与跨终端长期记忆闭环</p>
+</div>
+
+<div class="river-wrap">
+
+  <div class="lc">
+
+    <div class="card" style="border-top: 4px solid #2563eb;">
+      <div class="sig-to-river">任务编排分发 ➔</div>
+      <div class="card-meta">平安DO · 内勤系统</div>
+      <div class="card-title">① 营销规划智能体 <span style="font-size:10px; font-weight:normal; color:#2563eb; background:#dbeafe; padding:2px 4px; border-radius:4px;">Lead Agent</span></div>
+      <div class="prop-group">
+        <span class="prop-label">输入要素:</span>
+        <span class="prop-val">1. NBEV 业绩战略目标</span>
+      </div>
+      <div class="prop-group">
+        <span class="prop-label">原子工具:</span>
+        <span class="skill-badge">目标动态拆解</span>
+        <span class="skill-badge">达成路径规划</span>
+      </div>
+      <div class="prop-group">
+        <span class="prop-label">核心输出:</span>
+        <span class="prop-val" style="color:#1e3a8a; font-weight:500;">
+          • 确定主推/次推产品及居家、医养权益规划<br>
+          • 锁定面谈对象与主题（双金钻/钻石代理人）<br>
+          • 生成 1vN 活动计划（频次、主题、客户标签）
+        </span>
+      </div>
+    </div>
+
+    <div class="empty-cell" style="height:40px;"></div>
+
+    <div class="card" style="border-top: 4px solid #3b82f6;">
+      <div class="sig-to-river">沉淀核心目标 ➔</div>
+      <div class="card-meta">平安DO · 内勤系统</div>
+      <div class="card-title">② 追踪管理智能体 (内勤)</div>
+      <div class="prop-group">
+        <span class="prop-label">首要机制:</span>
+        <span class="prop-val" style="color:#b91c1c; font-weight:bold;">[面试/面谈辅助阶段] 先确立目标再进行追踪</span>
+      </div>
+      <div class="prop-group">
+        <span class="prop-label">输入要素:</span>
+        <span class="prop-val">营销规划输出的"高级别目标代理人"及面谈主题</span>
+      </div>
+      <div class="prop-group">
+        <span class="prop-label">原子工具:</span>
+        <span class="skill-badge">高级面谈辅助</span>
+        <span class="skill-badge">内勤督导工具</span>
+      </div>
+      <div class="prop-group">
+        <span class="prop-label">核心输出:</span>
+        <span class="prop-val">• 确立高职级代理人的 FYC 与件数等具体达成目标</span>
+      </div>
+    </div>
+
+    <div class="empty-cell" style="height:260px;"></div>
+  </div>
+
+
+  <div class="rv">
+    <div class="rv-title">DeerFlow 2.0 运行总线</div>
+
+    <div class="rv-core-box">
+      <div class="rv-core-title">1. 多智能体动态编排</div>
+      <div class="rv-core-desc">Lead Agent 接收战略目标，动态激活并下发任务至各子智能体</div>
+    </div>
+    <div class="r-seg" style="height:35px;"></div>
+    <div class="r-node">Long-Term Memory 记忆网络</div>
+    <div class="r-seg" style="height:35px;"></div>
+
+    <div class="rv-core-box" style="border-color: #f59e0b; background: #fffbeb;">
+      <div class="rv-core-title" style="color: #b45309;">2. 面谈首要机制校验</div>
+      <div class="rv-core-desc" style="color: #78350f;">严格拦截：必须先执行面谈辅助以确立 FYC/件数目标，方可解锁后续执行流</div>
+    </div>
+    <div class="r-seg" style="height:40px;"></div>
+    <div class="r-node">MCP 协议 / 跨终端数据对齐</div>
+    <div class="r-seg" style="height:40px;"></div>
+
+    <div class="rv-core-box" style="border-color: #ea580c; background: #fff7ed;">
+      <div class="rv-core-title" style="color: #c2410c;">3. AIO Sandbox 隔离沙箱</div>
+      <div class="rv-core-desc" style="color: #9a3412;">为经营和测算智能体提供独立 Bash 与 Python 环境，执行真实精算与数据盘客</div>
+    </div>
+    <div class="r-seg" style="height:20px;"></div>
+
+    <div class="r-node" style="background:#15803d;">↩ 跨会话异步回流</div>
+    <div style="font-size:9px; color:#166534; text-align:center; margin-top:2px; font-weight:bold;">流回 ②/③ 面谈辅助阶段</div>
+    <div class="r-seg" style="height:20px;"></div>
+  </div>
+
+
+  <div class="rc">
+
+    <div class="empty-cell" style="height:200px;"></div>
+
+    <div class="card" style="border-top: 4px solid #f97316;">
+      <div class="sig-from-river">⮨ 调取记忆/对齐目标</div>
+      <div class="card-meta">口袋E · 外勤系统</div>
+      <div class="card-title">③ 追踪管理智能体 (外勤)</div>
+      <div class="prop-group">
+        <span class="prop-label">首要机制:</span>
+        <span class="prop-val" style="color:#b91c1c; font-weight:bold;">[面试/面谈辅助阶段] 先确立目标再进行追踪</span>
+      </div>
+      <div class="prop-group">
+        <span class="prop-label">输入要素:</span>
+        <span class="prop-val">营销规划输出的"基层的目标代理人"及面谈主题</span>
+      </div>
+      <div class="prop-group">
+        <span class="prop-label">原子工具:</span>
+        <span class="skill-badge">基层面谈辅助</span>
+        <span class="skill-badge">外勤自我追踪</span>
+      </div>
+      <div class="prop-group">
+        <span class="prop-label">核心输出:</span>
+        <span class="prop-val">• 确立基层代理人的 FYC 与件数等具体达成目标</span>
+      </div>
+    </div>
+
+    <div class="card" style="border-top: 4px solid #ea580c;">
+      <div class="sig-from-river">⮨ 沙箱数据动态加载</div>
+      <div class="card-meta">口袋E · 外勤系统</div>
+      <div class="card-title">④ 客户经营智能体</div>
+      <div class="prop-group">
+        <span class="prop-label">输入要素:</span>
+        <span class="prop-val">1. 步骤②③确定的 FYC/件数目标<br>2. 步骤①规划的 1vN 活动计划与客户标签</span>
+      </div>
+      <div class="prop-group">
+        <span class="prop-label">原子工具:</span>
+        <span class="sandbox-badge">Docker沙箱盘客圈客</span>
+        <span class="skill-badge">智能邀约</span>
+        <span class="skill-badge">场景化拜访</span>
+      </div>
+      <div class="prop-group">
+        <span class="prop-label">核心输出:</span>
+        <span class="prop-val" style="color:#7c2d12;">
+          • 动态沉淀代理人客户经营数据与业绩表现数据<br>
+          • 精准捕捉并抽取<b>"客户保障需求"</b> ➔ 导向智能体⑤<br>
+          • 自动诊断并识别<b>"代理人培训需求"</b> ➔ 导向智能体⑥
+        </span>
+      </div>
+    </div>
+
+    <div class="card" style="border-top: 4px solid #c2410c;">
+      <div class="sig-from-river">⮨ 精算公式沙箱运行</div>
+      <div class="card-meta">口袋E · 外勤系统</div>
+      <div class="card-title">⑤ 产品销售智能体</div>
+      <div class="prop-group">
+        <span class="prop-label">输入要素:</span>
+        <span class="prop-val">客户保障需求（由客户经营智能体在线抽取并输入）</span>
+      </div>
+      <div class="prop-group">
+        <span class="prop-label">原子工具:</span>
+        <span class="sandbox-badge">Python隔离保障测算</span>
+      </div>
+      <div class="prop-group">
+        <span class="prop-label">核心输出:</span>
+        <span class="prop-val" style="color:#7c2d12; font-weight:500;">• 自动化生成千人千面的精准客户保障测算书与建议书</span>
+      </div>
+    </div>
+
+    <div class="card" style="border-top: 4px solid #9a3412;">
+      <div class="card-meta">口袋E · 外勤系统</div>
+      <div class="card-title">⑥ 问答陪练智能体</div>
+      <div class="prop-group">
+        <span class="prop-label">输入要素:</span>
+        <span class="prop-val">代理人培训需求（由客户经营智能体在销售痛点中识别输入）</span>
+      </div>
+      <div class="prop-group">
+        <span class="prop-label">原子工具:</span>
+        <span class="skill-badge">大模型通关陪练</span>
+        <span class="skill-badge">话术对练对抗</span>
+      </div>
+      <div class="prop-group">
+        <span class="prop-label">核心输出:</span>
+        <span class="prop-val">• 生成代理人培训行为及能力成长数据（异步回流至下一轮面谈辅助名单）</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div style="max-width:1100px;margin:24px auto 0;">
+  <div class="loop-section">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.49-6.5"/></svg>
+      <div style="font-size:10px;font-weight:bold;color:#16a34a;">DeerFlow 闭环</div>
+    </div>
+    <div class="loop-desc">
+      <span class="loop-title">DeerFlow 架构升级要点说明：</span><br>
+      1. <b>面谈首要拦截（Primary Mechanism）</b>：系统重构后，②号与③号"追踪管理智能体"作为核心流转关卡。无论是内勤督导高职级、还是外勤追踪基层，必须先通过"面谈辅助Skill"在沙箱中确立或更新代理人的 FYC 与件数目标，后续的客户经营、保障测算、以及问答陪练才允许读取上下文并开始流转。防止 AI 脱离业务目标盲目运行。<br>
+      2. <b>AIO Sandbox（隔离安全沙箱）</b>：④号盘客和⑤号保障测算工具，全部由 DeerFlow 原生 Docker 沙箱托管。大模型在此阶段被赋予真实的 Python 执行能力，能够处理海量的平安客户标签筛选，并能运行复杂的金融险种精算公式，杜绝了大模型的数字幻觉。<br>
+      3. <b>长期记忆与异步流回（Long-Term Memory Loop）</b>：⑥号问答陪练产生的能力诊断数据，以及④号经营产生的业绩表现，通过 DeerFlow 的异步记忆机制，跨会话直接流回下一轮面谈名单中，从而动态调整下一次"面谈辅助"的沟通策略，构成完美业务闭环。
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

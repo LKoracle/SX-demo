@@ -1,0 +1,3161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>平安DO - AI智能助手</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --primary: #2563eb;
+    --primary-light: #3b82f6;
+    --primary-dark: #1e40af;
+    --bg-deep: #0f172a;
+    --bg-nav: #1e293b;
+    --bg-sidebar: #f8fafc;
+    --bg-main: #f1f5f9;
+    --bg-card: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --border: #e2e8f0;
+    --border-light: #f1f5f9;
+    --accent-orange: #f59e0b;
+    --accent-green: #10b981;
+    --accent-red: #ef4444;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-xs: 6px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-main);
+    color: var(--text-primary);
+    font-size: 14px;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ===== TOP NAV ===== */
+  .top-nav {
+    background: var(--bg-deep);
+    height: 52px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    color: #fff;
+    z-index: 100;
+    position: relative;
+  }
+  .top-nav::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(59,130,246,0.5), transparent);
+  }
+
+  .nav-logo { display: flex; align-items: center; gap: 10px; margin-right: 28px; }
+  .nav-logo-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--primary) 0%, #60a5fa 100%);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; color: #fff; font-size: 15px;
+    letter-spacing: -0.5px;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.4);
+  }
+  .nav-logo-text { font-size: 16px; font-weight: 600; letter-spacing: 0.5px; }
+  .nav-logo-sub { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: -1px; }
+
+  .nav-menu { display: flex; flex: 1; }
+  .nav-menu a {
+    color: rgba(255,255,255,0.6); text-decoration: none;
+    padding: 0 14px; height: 52px;
+    display: flex; align-items: center; font-size: 13px;
+    transition: all 0.25s; position: relative;
+    font-weight: 400;
+  }
+  .nav-menu a:hover { color: rgba(255,255,255,0.9); }
+  .nav-menu a.active {
+    color: #fff; font-weight: 500;
+  }
+  .nav-menu a.active::after {
+    content: ''; position: absolute; bottom: 0; left: 14px; right: 14px;
+    height: 2px; background: var(--primary-light); border-radius: 2px 2px 0 0;
+  }
+
+  .nav-right { display: flex; align-items: center; gap: 14px; }
+  .nav-right-icon {
+    width: 18px; height: 18px; cursor: pointer; opacity: 0.5;
+    transition: opacity 0.2s;
+  }
+  .nav-right-icon:hover { opacity: 0.9; }
+  .nav-avatar {
+    display: flex; align-items: center; gap: 8px; cursor: pointer;
+    padding: 4px 8px; border-radius: 20px;
+    transition: background 0.2s;
+  }
+  .nav-avatar:hover { background: rgba(255,255,255,0.08); }
+  .nav-avatar-circle {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), #60a5fa);
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ===== 3-COLUMN LAYOUT ===== */
+  .app-body {
+    display: flex;
+    height: calc(100vh - 52px);
+    overflow: hidden;
+  }
+
+  /* ===== LEFT SIDEBAR: Claude-style Light ===== */
+  .sidebar-left {
+    width: 260px;
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    color: var(--text-primary);
+  }
+  .sidebar-brand {
+    padding: 18px 16px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .sidebar-brand-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+  }
+  .sidebar-collapse-btn {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted);
+    transition: all 0.15s;
+  }
+  .sidebar-collapse-btn:hover { background: rgba(0,0,0,0.05); color: var(--text-secondary); }
+
+  .sidebar-nav {
+    padding: 0 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .sidebar-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+  .sidebar-nav-item:hover { background: rgba(0,0,0,0.04); color: var(--text-primary); }
+  .sidebar-nav-icon {
+    width: 18px; height: 18px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    opacity: 0.6;
+  }
+
+  .sidebar-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 18px 16px;
+  }
+
+  /* New Chat Button — Claude Code style */
+  .sidebar-new-chat {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 8px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    border: 1px dashed var(--border);
+    background: transparent;
+  }
+  .sidebar-new-chat:hover {
+    background: rgba(0,0,0,0.04);
+    color: var(--text-primary);
+    border-color: var(--text-muted);
+  }
+  .sidebar-new-chat svg {
+    opacity: 0.6;
+    flex-shrink: 0;
+  }
+  .sidebar-new-chat:hover svg {
+    opacity: 1;
+  }
+
+  .sidebar-section-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 10px 16px 6px;
+    font-weight: 500;
+  }
+
+  .chat-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 8px 12px;
+  }
+  .chat-list::-webkit-scrollbar { width: 4px; }
+  .chat-list::-webkit-scrollbar-thumb { background: #d4d4d4; border-radius: 4px; }
+  .chat-list::-webkit-scrollbar-track { background: transparent; }
+
+  .chat-item {
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--text-secondary);
+    border: 1px solid transparent;
+  }
+  .chat-item:hover { background: rgba(0,0,0,0.04); color: var(--text-primary); }
+  .chat-item.active {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border-color: var(--border);
+    box-shadow: var(--shadow-sm);
+  }
+  .chat-item-title {
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+  }
+  .chat-item-more {
+    opacity: 0;
+    transition: opacity 0.15s;
+    color: var(--text-muted);
+    font-size: 16px;
+    letter-spacing: -3px;
+    flex-shrink: 0;
+    padding-left: 8px;
+    line-height: 1;
+  }
+  .chat-item:hover .chat-item-more { opacity: 1; }
+
+  /* ===== CENTER: AI Chat ===== */
+  .center-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-main);
+    min-width: 0;
+    padding: 16px;
+  }
+  .chat-frame {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-card);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 28px;
+    background: #fafbfd;
+  }
+  .chat-messages::-webkit-scrollbar { width: 5px; }
+  .chat-messages::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+  /* AI Welcome */
+  .ai-welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 0 20px;
+  }
+  .ai-avatar-large {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(37,99,235,0.25);
+    margin-bottom: 12px;
+    border: 2px solid #dbeafe;
+  }
+  .ai-avatar-large img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .ai-welcome h2 {
+    font-size: 18px; font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+  .ai-welcome p {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  /* Message Bubbles */
+  .msg-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    max-width: 100%;
+    animation: msgIn 0.3s ease-out;
+  }
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .msg-row.user { justify-content: flex-end; }
+  .msg-avatar {
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .msg-avatar.ai {
+    background: transparent;
+    overflow: hidden;
+    border-radius: 50%;
+  }
+  .msg-avatar.ai img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .msg-avatar.user-av {
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  }
+  .msg-bubble {
+    max-width: 85%;
+    padding: 12px 16px;
+    border-radius: 14px;
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--text-primary);
+  }
+  .msg-bubble.ai-bubble {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-top-left-radius: 4px;
+    box-shadow: var(--shadow-sm);
+  }
+  .msg-bubble.user-bubble {
+    background: var(--primary);
+    color: #fff;
+    border-top-right-radius: 4px;
+  }
+
+  /* ===== DASHBOARD: Two Panel Layout ===== */
+  .dashboard-wrap {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  .dashboard-panel {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 12px 14px;
+    box-shadow: var(--shadow-sm);
+  }
+  .dashboard-panel.panel-biz { flex: 2; }
+  .dashboard-panel.panel-hr { flex: 1; }
+  .panel-title {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 600; color: var(--text-primary);
+    margin-bottom: 6px; padding-bottom: 4px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .panel-title .icon-wrap {
+    width: 24px; height: 24px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .panel-title .icon-wrap.biz-icon { background: #fff7ed; }
+  .panel-title .icon-wrap.hr-icon { background: #eff6ff; }
+  .kpi-row-db { display: flex; gap: 8px; margin-bottom: 8px; }
+  .kpi-card {
+    flex: 1; background: var(--bg-sidebar); border-radius: var(--radius-sm);
+    padding: 8px 10px;
+  }
+  .kpi-card-label {
+    font-size: 12px; color: var(--text-secondary);
+    display: flex; align-items: center; gap: 6px; margin-bottom: 4px;
+  }
+  .kpi-card-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .kpi-card-dot.orange { background: #f97316; }
+  .kpi-card-dot.teal { background: #0d9488; }
+  .kpi-card-value { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+  .kpi-card-unit { font-size: 12px; font-weight: 400; color: var(--text-muted); }
+  .chart-section { margin-top: 2px; }
+  .chart-header { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+  .chart-legend { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-secondary); }
+  .chart-legend-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .chart-filter-btn {
+    margin-left: auto; padding: 3px 10px;
+    border: 1px solid var(--border); border-radius: var(--radius-xs);
+    font-size: 11px; color: var(--text-secondary); background: var(--bg-card); cursor: pointer;
+  }
+  .chart-area-db { position: relative; height: 100px; margin: 4px 0; }
+  .chart-x-axis-db {
+    display: flex; justify-content: space-between;
+    color: var(--text-muted); font-size: 11px; padding-top: 6px;
+  }
+  .hr-stat-grid { display: flex; gap: 4px; margin-bottom: 2px; }
+  .hr-stat-card { flex: 1; }
+  .hr-stat-card {
+    background: var(--bg-sidebar); border-radius: var(--radius-sm);
+    padding: 4px 8px; text-align: center;
+  }
+  
+  .hr-stat-label { font-size: 10px; color: var(--text-muted); margin-bottom: 1px; }
+  .hr-stat-value { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+  .hr-stat-sub { font-size: 9px; color: var(--text-muted); margin-top: 1px; }
+  .radar-section {
+    padding-top: 2px; border-top: 1px solid var(--border-light);
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .radar-section-title {
+    font-size: 12px; font-weight: 500; color: var(--text-secondary);
+    margin-bottom: 6px; align-self: flex-start;
+  }
+  .radar-stats { display: flex; justify-content: space-around; width: 100%; margin-top: 2px; }
+  .radar-stat-item { text-align: center; }
+  .radar-stat-label { font-size: 9px; color: var(--text-muted); }
+  .radar-stat-val { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-top: 1px; }
+  .chart-svg { width: 100%; height: 100%; }
+  .grid-line { stroke: #f0f0f0; stroke-width: 1; }
+
+  
+  /* Sidebar collapse: icon-only rail */
+  .sidebar-left {
+    transition: width 0.25s ease;
+    overflow: hidden;
+  }
+  .sidebar-left.collapsed {
+    width: 52px !important;
+  }
+  .sidebar-left.collapsed .sidebar-brand-name,
+  .sidebar-left.collapsed .sidebar-nav-item span,
+  .sidebar-left.collapsed .sidebar-section-label,
+  .sidebar-left.collapsed .chat-list,
+  .sidebar-left.collapsed .sidebar-divider,
+  .sidebar-left.collapsed .sidebar-new-chat span {
+    display: none;
+  }
+  .sidebar-left.collapsed .sidebar-brand {
+    padding: 14px 0;
+    justify-content: center;
+  }
+  .sidebar-left.collapsed .sidebar-collapse-btn {
+    margin: 0;
+  }
+  .sidebar-left.collapsed .sidebar-nav {
+    padding: 4px 0;
+    align-items: center;
+    gap: 2px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-left.collapsed .sidebar-nav:last-of-type {
+    border-bottom: none;
+  }
+  .sidebar-left.collapsed .sidebar-nav-item {
+    width: 36px; height: 36px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 8px;
+    gap: 0;
+  }
+  .sidebar-left.collapsed .sidebar-new-chat {
+    width: 36px; height: 36px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 8px;
+    gap: 0;
+    margin: 0 auto;
+    border-style: solid;
+  }
+  .sidebar-left.collapsed .sidebar-nav-icon {
+    width: 20px; height: 20px;
+  }
+  .center-panel {
+    transition: flex 0.25s ease;
+  }
+  /* Hide expand btn - no longer needed */
+  .sidebar-expand-btn { display: none !important; }
+
+  
+  /* Fullscreen button on dashboard panels */
+  .panel-fullscreen-btn {
+    width: 24px; height: 24px; border-radius: 5px;
+    border: 1px solid var(--border); background: var(--bg-card);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted); transition: all 0.15s; margin-left: auto; flex-shrink: 0;
+  }
+  .panel-fullscreen-btn:hover { background: var(--bg-sidebar); color: var(--text-primary); }
+  .dashboard-panel.fullscreen-mode {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 1000; border-radius: 0; border: none;
+    padding: 24px 32px; overflow-y: auto;
+  }
+  .dashboard-panel.fullscreen-mode .chart-area-db { height: 300px; }
+  .fullscreen-overlay {
+    display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4); z-index: 999;
+  }
+  .fullscreen-overlay.active { display: block; }
+
+  /* Path dimension options — polished AI style */
+  .path-options-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .path-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+    position: relative;
+    overflow: hidden;
+  }
+  .path-option::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--primary);
+    opacity: 0;
+    transition: opacity 0.25s;
+    border-radius: 0 2px 2px 0;
+  }
+  .path-option:hover {
+    border-color: #c7d2fe;
+    background: #f8faff;
+    transform: translateX(2px);
+  }
+  .path-option:hover::before {
+    opacity: 0.4;
+  }
+  .path-option.selected {
+    border-color: var(--primary-light);
+    background: #eef2ff;
+  }
+  .path-option.selected::before {
+    opacity: 1;
+  }
+  .path-option-dot {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.25s;
+    background: var(--bg-card);
+  }
+  .path-option.selected .path-option-dot {
+    border-color: var(--primary);
+    background: var(--primary);
+  }
+  .path-option-dot-inner {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #fff;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .path-option.selected .path-option-dot-inner {
+    opacity: 1;
+  }
+  .path-option-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    transition: color 0.2s;
+  }
+  .path-option.selected .path-option-label {
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .path-response-header {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  /* NBEV target input card */
+  .nbev-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: all 0.25s;
+    cursor: text;
+  }
+  .nbev-input-wrap:focus-within {
+    border-color: var(--primary-light);
+    background: #f8faff;
+  }
+  .nbev-input-wrap.has-value {
+    border-color: var(--primary);
+    background: #eef2ff;
+  }
+  .nbev-input-wrap.has-value .path-option-dot {
+    border-color: var(--primary);
+    background: var(--primary);
+  }
+  .nbev-input-wrap.has-value .path-option-dot-inner {
+    opacity: 1;
+  }
+  
+  
+  /* Custom target confirm button */
+  .nbev-confirm-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 10px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-left: 4px;
+  }
+  .nbev-confirm-btn:hover { background: var(--primary-dark); }
+  .nbev-input-wrap.has-value .nbev-confirm-btn { display: flex; }
+  .nbev-input-wrap.confirmed {
+    border-color: var(--primary);
+    background: #eef2ff;
+    pointer-events: none;
+  }
+  .nbev-input-wrap.confirmed .nbev-input {
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .nbev-input-wrap.confirmed .nbev-confirm-btn {
+    display: flex;
+    background: #10b981;
+    pointer-events: none;
+  }
+  .nbev-input-wrap.confirmed .path-option-dot {
+    border-color: var(--primary);
+    background: var(--primary);
+  }
+  .nbev-input-wrap.confirmed .path-option-dot-inner {
+    opacity: 1;
+  }
+
+  /* Hide number input spinners */
+  .nbev-input::-webkit-outer-spin-button,
+  .nbev-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .nbev-input[type=number] { -moz-appearance: textfield; }
+
+  .nbev-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    width: 60px;
+    padding: 2px 0;
+  }
+  .nbev-input::placeholder {
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+  .nbev-unit {
+    font-size: 12px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+
+  /* Recommend questions above input — paged, 3 per screen */
+  .recommend-section {
+    padding: 0 28px 6px;
+    background: var(--bg-card);
+    overflow: hidden;
+  }
+  .recommend-viewport {
+    overflow: hidden;
+    position: relative;
+    height: 34px;
+    perspective: 200px;
+  }
+  .recommend-track {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .recommend-page {
+    display: flex;
+    gap: 8px;
+    height: 34px;
+    flex-shrink: 0;
+    align-items: center;
+  }
+  .recommend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--bg-sidebar);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .recommend-item:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: var(--primary);
+  }
+  .recommend-arrow {
+    flex-shrink: 0;
+    width: 10px; height: 12px;
+    display: inline-flex;
+    align-items: center;
+    opacity: 0.4;
+    transition: opacity 0.15s;
+    margin-left: 20px;
+  }
+  .recommend-item:hover .recommend-arrow { opacity: 0.8; }
+
+
+  /* AI Thinking card */
+  .thinking-card {
+    background: var(--bg-sidebar);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-top: 8px;
+    position: relative;
+  }
+
+  /* Shared width for all tool output bubbles */
+  .msg-bubble.tool-bubble {
+    max-width: 96%;
+    width: 560px;
+  }
+  .thinking-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .thinking-spinner {
+    width: 14px; height: 14px;
+    border: 2px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  .thinking-spinner.done { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .thinking-body {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  .thinking-body.collapsed {
+    max-height: 4.8em; /* ~3 lines at 1.6 line-height */
+  }
+  .thinking-body .cursor {
+    display: inline-block;
+    width: 2px;
+    height: 14px;
+    background: var(--primary);
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    animation: blink 0.6s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .thinking-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 8px;
+    padding: 4px 0;
+    font-size: 12px;
+    color: var(--primary);
+    cursor: pointer;
+    font-weight: 500;
+    transition: opacity 0.2s;
+    border: none;
+    background: none;
+    font-family: inherit;
+    width: 100%;
+  }
+  .thinking-toggle:hover { opacity: 0.7; }
+  .thinking-toggle.visible { display: flex; }
+  .thinking-toggle svg { transition: transform 0.3s; }
+  .thinking-toggle.expanded svg { transform: rotate(180deg); }
+
+
+  /* ===== Atomic Tool: Team Profile Card ===== */
+  .team-profile-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-top: 8px;
+  }
+  .team-profile-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .team-profile-icon {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .team-profile-title {
+    font-size: 14px; font-weight: 600; color: var(--text-primary);
+  }
+  .team-profile-subtitle {
+    font-size: 11px; color: var(--text-muted); margin-left: auto;
+  }
+
+  /* Team level table */
+  .tp-chart-section { margin-bottom: 12px; }
+  .tp-chart-title {
+    font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 8px;
+  }
+  .tp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .tp-table th {
+    padding: 6px 4px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-sidebar);
+    font-size: 11px;
+  }
+  .tp-table th:first-child {
+    text-align: left;
+    padding-left: 10px;
+    min-width: 80px;
+  }
+  .tp-table td {
+    padding: 7px 4px;
+    text-align: center;
+    color: var(--text-primary);
+    font-weight: 500;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 12px;
+  }
+  .tp-table td:first-child {
+    text-align: left;
+    padding-left: 6px;
+  }
+  .tp-table tr:last-child td { border-bottom: none; }
+  .tp-table tr:hover td { background: #f8fafc; }
+  .tp-level-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .tp-level-dot {
+    width: 8px; height: 8px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .tp-table .tp-row-total td {
+    font-weight: 700;
+    color: var(--text-primary);
+    border-top: 1px solid var(--border);
+    background: var(--bg-sidebar);
+  }
+
+  /* NBEV trend section — line chart */
+  .tp-trend-section {
+    margin-top: 12px;
+  }
+  .tp-trend-title {
+    font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 8px;
+  }
+  .tp-trend-chart {
+    position: relative;
+    height: 110px;
+  }
+  .tp-trend-chart svg { width: 100%; height: 100%; }
+  .tp-trend-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-muted);
+    padding: 4px 8px 0;
+  }
+  .tp-trend-legend {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+  .tp-trend-legend-dot {
+    display: inline-block;
+    width: 12px; height: 3px;
+    border-radius: 2px;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+  .tp-trend-legend-line {
+    display: inline-block;
+    width: 14px; height: 0;
+    border-top: 2px dashed #f59e0b;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+
+  /* ===== Team Achievement Estimation Card ===== */
+  .team-achieve-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-top: 8px;
+  }
+  .team-achieve-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .team-achieve-icon {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .team-achieve-title {
+    font-size: 14px; font-weight: 600; color: var(--text-primary);
+  }
+  .team-achieve-subtitle {
+    font-size: 11px; color: var(--text-muted); margin-left: auto;
+  }
+
+  /* Pie chart layout */
+  .ta-pie-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .ta-pie-wrap {
+    width: 150px; height: 150px;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .ta-pie-wrap svg { width: 100%; height: 100%; }
+  .ta-pie-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .ta-pie-center-val {
+    font-size: 18px; font-weight: 700; color: var(--text-primary);
+  }
+  .ta-pie-center-label {
+    font-size: 10px; color: var(--text-muted);
+  }
+
+  .ta-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+  }
+  .ta-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    transition: background 0.15s;
+    cursor: default;
+  }
+  .ta-legend-item:hover { background: var(--bg-sidebar); }
+  .ta-legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .ta-legend-name {
+    font-size: 12px;
+    color: var(--text-secondary);
+    flex: 1;
+  }
+  .ta-legend-count {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 30px;
+    text-align: right;
+  }
+  .ta-legend-pct {
+    font-size: 11px;
+    color: var(--text-muted);
+    min-width: 36px;
+    text-align: right;
+  }
+
+  /* NBEV prediction summary */
+  .ta-nbev-summary {
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #eff6ff, #f0f4ff);
+    border: 1px solid #dbeafe;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .ta-nbev-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .ta-nbev-info { flex: 1; }
+  .ta-nbev-label {
+    font-size: 11px; color: var(--text-secondary); margin-bottom: 2px;
+  }
+  .ta-nbev-row {
+    display: flex; align-items: baseline; gap: 6px;
+  }
+  .ta-nbev-val {
+    font-size: 22px; font-weight: 700; color: var(--primary-dark);
+    letter-spacing: -0.5px;
+  }
+  .ta-nbev-unit {
+    font-size: 12px; color: var(--text-secondary); font-weight: 500;
+  }
+  .ta-nbev-badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #dcfce7;
+    color: #16a34a;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .ta-nbev-badge.warning {
+    background: #fef3c7;
+    color: #d97706;
+  }
+
+  /* Inline metrics: target + predicted side by side */
+  .ta-metrics-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .ta-metric-card {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--bg-sidebar);
+  }
+  .ta-metric-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .ta-metric-val-row {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+  .ta-metric-val {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.5px;
+  }
+  .ta-metric-val.primary { color: var(--primary-dark); }
+  .ta-metric-unit {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .ta-metric-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .ta-metric-badge.green { background: #dcfce7; color: #16a34a; }
+  .ta-metric-badge.yellow { background: #fef3c7; color: #d97706; }
+
+  /* Next step recommendations */
+  .ta-next-steps {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-light);
+  }
+  .ta-next-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+  .ta-next-btns {
+    display: flex;
+    gap: 8px;
+  }
+  .ta-next-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .ta-next-btn:hover {
+    border-color: var(--primary-light);
+    color: var(--primary);
+    background: #f8faff;
+  }
+  .ta-next-btn::before { display: none; }
+  .ta-next-btn svg {
+    flex-shrink: 0;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+  }
+  .ta-next-btn:hover svg { opacity: 1; }
+
+
+    /* ===== CHAT INPUT ===== */
+  .chat-input-bar {
+    padding: 12px 28px 16px;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border-light);
+  }
+  .chat-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 6px 6px 6px 16px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .chat-input-wrap:focus-within {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+  }
+  .chat-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text-primary);
+    background: transparent;
+    padding: 8px 0;
+  }
+  .chat-input::placeholder { color: var(--text-muted); }
+  .chat-input-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .input-action-btn {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted);
+    transition: all 0.15s;
+  }
+  .input-action-btn:hover { background: var(--bg-sidebar); color: var(--text-secondary); }
+  .send-btn {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    border: none;
+    background: var(--primary);
+    color: #fff;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.3);
+  }
+  .send-btn:hover {
+    background: var(--primary-dark);
+    box-shadow: 0 4px 12px rgba(37,99,235,0.4);
+    transform: translateY(-1px);
+  }
+
+  .quick-prompts {
+    display: flex;
+    margin-top: 8px;
+    overflow: hidden;
+    position: relative;
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+  .quick-prompts-track {
+    display: flex;
+    gap: 8px;
+    animation: scrollPrompts 18s linear infinite;
+    will-change: transform;
+  }
+  .quick-prompts:hover .quick-prompts-track {
+    animation-play-state: paused;
+  }
+  @keyframes scrollPrompts {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .quick-prompt-chip {
+    padding: 5px 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .quick-prompt-chip:hover {
+    border-color: var(--primary-light);
+    color: var(--primary);
+    background: #eff6ff;
+  }
+
+  /* ===== RIGHT SIDEBAR: Quick Entry ===== */
+  .sidebar-right {
+    width: 240px;
+    background: var(--bg-main);
+    border-left: none;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow-y: auto;
+    gap: 8px;
+    padding: 8px 0;
+  }
+  .sidebar-right::-webkit-scrollbar { width: 4px; }
+  .sidebar-right::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+
+  .sidebar-right-header {
+    padding: 12px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  /* Ad Banner */
+
+  /* Notice carousel */
+  .notice-carousel {
+    position: relative;
+    overflow: hidden;
+    margin: 0 12px 0 12px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .notice-track {
+    display: flex;
+    transition: transform 0.35s ease;
+    flex: 1;
+    min-height: 0;
+  }
+  .notice-slide {
+    flex: 0 0 100%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .notice-slide .ad-card {
+    margin: 0;
+    flex: 1;
+  }
+  .notice-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 0 4px;
+  }
+  .notice-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .notice-dot.active {
+    background: var(--primary);
+    width: 16px;
+    border-radius: 3px;
+  }
+  .notice-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.2s;
+    color: var(--text-secondary);
+    font-size: 11px;
+  }
+  .notice-carousel:hover .notice-nav { opacity: 1; }
+  .notice-nav:hover { background: #fff; box-shadow: var(--shadow-sm); }
+  .notice-nav.prev { left: 4px; }
+  .notice-nav.next { right: 4px; }
+
+  .sidebar-ad {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    background: var(--bg-card);
+    border-radius: 4px;
+    margin: 0 8px;
+  }
+  .ad-card {
+    margin: 10px 12px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid var(--border);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .ad-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: #c7d2fe;
+  }
+  .ad-banner-img {
+    width: 100%;
+    flex: 1;
+    min-height: 60px;
+    background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 50%, #3b82f6 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .ad-banner-img::before {
+    content: '';
+    position: absolute;
+    top: -20px; right: -20px;
+    width: 80px; height: 80px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+  }
+  .ad-banner-img::after {
+    content: '';
+    position: absolute;
+    bottom: -30px; left: -10px;
+    width: 100px; height: 100px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+  }
+  .ad-banner-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    z-index: 1;
+  }
+  .ad-banner-title span {
+    color: #fbbf24;
+  }
+  .ad-body {
+    padding: 10px 12px;
+    background: var(--bg-card);
+  }
+  .ad-body-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+  .ad-body-desc {
+    font-size: 11px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 6px;
+  }
+  .ad-body-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .ad-tag {
+    font-size: 10px;
+    color: var(--primary);
+    background: #eff6ff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+  .ad-link {
+    font-size: 11px;
+    color: var(--primary);
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .ad-link:hover { opacity: 0.7; }
+
+  /* Quick entry section takes equal half */
+  .sidebar-quick-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    background: var(--bg-card);
+    border-radius: 4px;
+    margin: 0 8px;
+  }
+
+  .quick-grid-ai {
+    padding: 8px 10px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+  }
+  .quick-item-ai {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .quick-item-ai:hover {
+    background: var(--bg-sidebar);
+    transform: translateY(-2px);
+  }
+  .quick-icon-ai {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    background: #eff6ff;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .quick-item-ai:hover .quick-icon-ai {
+    background: #dbeafe;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.15);
+  }
+  .quick-label-ai {
+    font-size: 10px;
+    color: var(--text-secondary);
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  /* AI Tools section in right sidebar */
+
+  /* SVG helpers */
+  .chart-svg { width: 100%; height: 100%; }
+  .grid-line { stroke: #f0f0f0; stroke-width: 1; }
+
+  /* Scrollbar global */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <div class="nav-logo">
+    <div class="nav-logo-icon">DO</div>
+    <div>
+      <div class="nav-logo-text">平安DO</div>
+      <div class="nav-logo-sub">AI智能工作台</div>
+    </div>
+  </div>
+  <div class="nav-menu">
+    <a href="#" class="active">AI 首页</a>
+    <a href="#">智慧客经平台</a>
+    <a href="#">人发管理</a>
+    <a href="#">产能管理</a>
+    <a href="#">日常管理</a>
+    <a href="#">产品板块</a>
+    <a href="#">平台管理</a>
+  </div>
+  <div class="nav-right">
+    <div id="versionToggle" onclick="toggleVersion()" style="display:flex;align-items:center;gap:6px;padding:6px 16px;background:rgba(255,255,255,0.15);border-radius:8px;cursor:pointer;transition:all 0.2s;border:1px solid rgba(255,255,255,0.3);margin-right:8px;box-shadow:0 0 0 1px rgba(255,255,255,0.05);" onmouseenter="this.style.background='rgba(255,255,255,0.25)';this.style.borderColor='rgba(255,255,255,0.5)'" onmouseleave="this.style.background='rgba(255,255,255,0.15)';this.style.borderColor='rgba(255,255,255,0.3)'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+      <span style="font-size:13px;color:#fff;font-weight:500;" id="versionLabel">切换经典版</span>
+    </div>
+    <svg class="nav-right-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v1m0 16v1m-9-9h1m16 0h1m-2.636-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707"/><circle cx="12" cy="12" r="4"/></svg>
+    <svg class="nav-right-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+    <div class="nav-avatar">
+      <div class="nav-avatar-circle">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg>
+      </div>
+      <span style="font-size:13px;color:rgba(255,255,255,0.7)">李平安</span>
+    </div>
+  </div>
+</nav>
+
+<div class="app-body">
+
+  <!-- ===== LEFT SIDEBAR: Claude-style ===== -->
+  <div class="sidebar-left">
+    <div class="sidebar-brand">
+      <span class="sidebar-brand-name">平安DO</span>
+      <button class="sidebar-collapse-btn" id="collapseBtn" title="收起侧栏" onclick="toggleSidebar()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+      </button>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="sidebar-new-chat" onclick="newChat()" title="新建对话">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span>新建对话</span>
+      </div>
+    </div>
+
+
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section-label">历史记录</div>
+
+    <div class="chat-list">
+      <div class="chat-item active">
+        <div class="chat-item-title">数据看板总览</div>
+        <div class="chat-item-more">•••</div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-item-title">人力分析报告</div>
+        <div class="chat-item-more">•••</div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-item-title">产能提升建议</div>
+        <div class="chat-item-more">•••</div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-item-title">客户经营策略</div>
+        <div class="chat-item-more">•••</div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-item-title">月度业绩对比</div>
+        <div class="chat-item-more">•••</div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-item-title">活动策划助手</div>
+        <div class="chat-item-more">•••</div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-item-title">晋升条件查询</div>
+        <div class="chat-item-more">•••</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CENTER: AI Chat ===== -->
+  <div class="center-panel" style="position:relative;">
+    <button class="sidebar-expand-btn" id="expandBtn" title="展开侧栏" onclick="toggleSidebar()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+    </button>
+    <div class="chat-frame">
+    <div class="chat-messages">
+
+      <!-- AI Welcome Greeting - inside chat as first message -->
+      <div class="msg-row">
+        <div class="msg-avatar ai">
+          <img src="data:image/jpeg;base64,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" alt="万能营销助手"/>
+        </div>
+        <div class="msg-bubble ai-bubble">
+          您好，我是万能营销助手。为您提供营销规划、追踪管理与内容创作
+        </div>
+      </div>
+
+      <!-- AI Message: Dashboard -->
+      <div class="msg-row">
+        <div class="msg-avatar ai"><img src="data:image/jpeg;base64,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" alt="助手"/></div>
+        <div class="msg-bubble ai-bubble" style="max-width:92%;">
+          <div style="margin-bottom:6px;color:var(--text-secondary);font-size:13px;">
+            已为您加载最新的数据看板，以下是当前经营概览：
+          </div>
+
+          <!-- DASHBOARD: Two Panels -->
+          <div class="dashboard-wrap">
+            <!-- ===== 经营数据看板 (2/3) ===== -->
+            <div class="dashboard-panel panel-biz">
+              <div class="panel-title">
+                <div class="icon-wrap biz-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                </div>
+                经营数据看板
+                <span style="margin-left:auto;font-size:11px;font-weight:400;color:var(--text-muted);">📍 浙江温州市 · 个险</span>
+                <button class="panel-fullscreen-btn" onclick="openFullscreenTab('biz')" title="全屏" style="width:auto;padding:0 8px;font-size:11px;gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>全屏</button>
+              </div>
+
+              <div class="kpi-row-db">
+                <div class="kpi-card">
+                  <div class="kpi-card-label"><span class="kpi-card-dot orange"></span> FYP</div>
+                  <div class="kpi-card-value">1,286 <span class="kpi-card-unit">万元</span></div>
+                </div>
+                <div class="kpi-card">
+                  <div class="kpi-card-label"><span class="kpi-card-dot teal"></span> NBEV</div>
+                  <div class="kpi-card-value">463 <span class="kpi-card-unit">万元</span></div>
+                </div>
+              </div>
+
+              <div class="chart-section">
+                <div class="chart-header">
+                  <div class="chart-legend">
+                    <span class="chart-legend-dot" style="background:#f97316;"></span> FYP
+                  </div>
+                  <div class="chart-legend">
+                    <span class="chart-legend-dot" style="background:#0d9488;"></span> NBEV
+                  </div>
+                  <div class="chart-filter-btn">筛选 ▾</div>
+                </div>
+                <div class="chart-area-db">
+                  <svg class="chart-svg" viewBox="0 0 600 120">
+                    <defs>
+                      <linearGradient id="fyp-fill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#f97316" stop-opacity="0.15"/>
+                        <stop offset="100%" stop-color="#f97316" stop-opacity="0.01"/>
+                      </linearGradient>
+                      <linearGradient id="nbev-fill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#0d9488" stop-opacity="0.12"/>
+                        <stop offset="100%" stop-color="#0d9488" stop-opacity="0.01"/>
+                      </linearGradient>
+                    </defs>
+                    <line x1="0" y1="23" x2="600" y2="23" class="grid-line" stroke-dasharray="3,3"/>
+                    <line x1="0" y1="46" x2="600" y2="46" class="grid-line" stroke-dasharray="3,3"/>
+                    <line x1="0" y1="69" x2="600" y2="69" class="grid-line" stroke-dasharray="3,3"/>
+                    <line x1="0" y1="92" x2="600" y2="92" class="grid-line" stroke-dasharray="3,3"/>
+                    <line x1="0" y1="115" x2="600" y2="115" stroke="#e8e8e8" stroke-width="1"/>
+                    <!-- FYP curve -->
+                    <path d="M0,90 C50,86 100,76 150,68 C200,61 250,46 300,42 C350,38 400,34 450,30 C500,28 550,32 600,26" fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round"/>
+                    <path d="M0,90 C50,86 100,76 150,68 C200,61 250,46 300,42 C350,38 400,34 450,30 C500,28 550,32 600,26 L600,155 L0,155 Z" fill="url(#fyp-fill)"/>
+                    <!-- NBEV curve -->
+                    <path d="M0,100 C50,96 100,92 150,85 C200,79 250,70 300,65 C350,60 400,57 450,53 C500,50 550,52 600,48" fill="none" stroke="#0d9488" stroke-width="2.5" stroke-linecap="round"/>
+                    <path d="M0,100 C50,96 100,92 150,85 C200,79 250,70 300,65 C350,60 400,57 450,53 C500,50 550,52 600,48 L600,155 L0,155 Z" fill="url(#nbev-fill)"/>
+                  </svg>
+                </div>
+                <div class="chart-x-axis-db">
+                  <span>4月1日</span><span>4月5日</span><span>4月10日</span><span>4月15日</span><span>4月20日</span><span>4月25日</span><span>4月30日</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- ===== 人力看板 (1/3) ===== -->
+            <div class="dashboard-panel panel-hr">
+              <div class="panel-title">
+                <div class="icon-wrap hr-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                </div>
+                人力看板
+                <button class="panel-fullscreen-btn" onclick="openFullscreenTab('hr')" title="全屏" style="margin-left:auto;width:auto;padding:0 8px;font-size:11px;gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>全屏</button>
+              </div>
+
+              <div class="hr-stat-grid">
+                <div class="hr-stat-card">
+                  <div class="hr-stat-label">当前人力</div>
+                  <div class="hr-stat-value" style="color:var(--primary);">352 人</div>
+                </div>
+                <div class="hr-stat-card">
+                  <div class="hr-stat-label">新增人力</div>
+                  <div class="hr-stat-value" style="color:#10b981;">28 人</div>
+                  <div class="hr-stat-sub">增员率: 8.6%</div>
+                </div>
+                <div class="hr-stat-card">
+                  <div class="hr-stat-label">脱落人力</div>
+                  <div class="hr-stat-value" style="color:#ef4444;">15 人</div>
+                  <div class="hr-stat-sub">脱落率: 4.3%</div>
+                </div>
+              </div>
+
+              <div class="radar-section">
+                
+                <svg width="180" height="120" viewBox="0 0 220 190" style="margin:8px auto -8px;">
+                  <g transform="translate(110,88)">
+                    <polygon points="0,-65 62,-20 38,53 -38,53 -62,-20" fill="none" stroke="#e2e8f0" stroke-width="0.8"/>
+                    <polygon points="0,-43 41,-13 25,35 -25,35 -41,-13" fill="none" stroke="#e2e8f0" stroke-width="0.6"/>
+                    <polygon points="0,-22 21,-7 13,18 -13,18 -21,-7" fill="none" stroke="#e2e8f0" stroke-width="0.4"/>
+                    <polygon points="0,-32 25,-10 16,21 -16,21 -25,-10" fill="rgba(37,99,235,0.1)" stroke="var(--primary)" stroke-width="1.5" opacity="0.7"/>
+                  </g>
+                  <text x="110" y="12" text-anchor="middle" font-size="9" fill="#94a3b8">钻石人力占比</text>
+                  <text x="110" y="24" text-anchor="middle" font-size="12" fill="#64748b" font-weight="600">12.5%</text>
+                  <text x="184" y="70" text-anchor="start" font-size="9" fill="#94a3b8">钻石会员占比</text>
+                  <text x="184" y="82" text-anchor="start" font-size="12" fill="#64748b" font-weight="600">8.3%</text>
+                  <text x="0" y="70" text-anchor="start" font-size="9" fill="#94a3b8">亲保有效</text>
+                  <text x="0" y="80" text-anchor="start" font-size="9" fill="#94a3b8">活动率</text>
+                  <text x="0" y="93" text-anchor="start" font-size="12" fill="#64748b" font-weight="600">15.2%</text>
+                </svg>
+                <div class="radar-stats">
+                  <div class="radar-stat-item">
+                    <div class="radar-stat-label">人均长险件数</div>
+                    <div class="radar-stat-val">1.8 件</div>
+                  </div>
+                  <div class="radar-stat-item">
+                    <div class="radar-stat-label">长险件均FYP</div>
+                    <div class="radar-stat-val">7,142 元</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- END DASHBOARD -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- CHAT INPUT -->
+    <div class="recommend-section" id="recommendSection">
+      <div class="recommend-viewport">
+        <div class="recommend-track" id="recommendTrack">
+          <div class="recommend-page">
+            <div class="recommend-item" onclick="askRecommend(this, true)">如何才能达成上级机构下发的NBEV目标？<svg class="recommend-arrow" width="10" height="12" viewBox="0 0 10 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="0" y1="6" x2="9" y2="6"/><line x1="5" y1="2" x2="9" y2="6"/></svg></div>
+            <div class="recommend-item" onclick="askRecommend(this, false)">我们团队人力如何分布的？<svg class="recommend-arrow" width="10" height="12" viewBox="0 0 10 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="0" y1="6" x2="9" y2="6"/><line x1="5" y1="2" x2="9" y2="6"/></svg></div>
+            <div class="recommend-item" onclick="askRecommend(this, false)">我们团队的客户是如何分布的？<svg class="recommend-arrow" width="10" height="12" viewBox="0 0 10 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="0" y1="6" x2="9" y2="6"/><line x1="5" y1="2" x2="9" y2="6"/></svg></div>
+          </div>
+          <div class="recommend-page">
+            <div class="recommend-item" onclick="askRecommend(this, false)">我该如何开展1vN活动？<svg class="recommend-arrow" width="10" height="12" viewBox="0 0 10 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="0" y1="6" x2="9" y2="6"/><line x1="5" y1="2" x2="9" y2="6"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="chat-input-bar">
+      <div class="chat-input-wrap">
+        <input class="chat-input" id="chatInput" type="text" placeholder="向万能营销助手提问，如：规划达成路径" onkeydown="if(event.key==='Enter')sendMessage()" />
+        <div class="chat-input-actions">
+          <button class="input-action-btn" title="语音输入">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          </button>
+          <button class="input-action-btn" title="上传附件">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+          </button>
+          <button class="send-btn" title="发送" onclick="sendMessage()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="quick-prompts" style="display:flex;gap:8px;margin-top:8px;flex-wrap:nowrap;">
+          <div class="quick-prompt-chip" onclick="triggerPathPlanning()">📈 规划达成路径</div>
+          <div class="quick-prompt-chip" onclick="triggerPathPlanning()">🎪 推荐场景活动</div>
+          <div class="quick-prompt-chip" onclick="triggerPathPlanning()">🎯 拆解目标计划</div>
+      </div>
+    </div>
+    </div><!-- end chat-frame -->
+  </div>
+
+  <!-- ===== RIGHT SIDEBAR: Quick Entry ===== -->
+  <div class="sidebar-right">
+
+    <!-- Ad Banner -->
+    <div class="sidebar-ad">
+      <div class="sidebar-right-header">公告通知</div>
+      <div class="notice-carousel" id="noticeCarousel">
+        <div class="notice-nav prev" onclick="slideNotice(-1)">‹</div>
+        <div class="notice-nav next" onclick="slideNotice(1)">›</div>
+        <div class="notice-track" id="noticeTrack">
+          <div class="notice-slide">
+            <div class="ad-card">
+              <div class="ad-banner-img">
+                <div class="ad-banner-title">🎉 <span>司庆季</span>开启</div>
+              </div>
+              <div class="ad-body">
+                <div class="ad-body-title">中国平安36周年司庆季正式启动</div>
+                <div class="ad-body-desc">司庆季专属产品限时推出，长险费率优惠叠加客户权益升级。活动期间签单享双倍积分，冲刺司庆荣誉榜。</div>
+                <div class="ad-body-footer">
+                  <span class="ad-tag">限时活动</span>
+                  <span class="ad-link">查看详情 →</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="notice-slide">
+            <div class="ad-card">
+              <div class="ad-banner-img" style="background:linear-gradient(135deg, #991b1b 0%, #dc2626 50%, #ef4444 100%);">
+                <div class="ad-banner-title">🏮 <span>开门红</span>冲刺</div>
+              </div>
+              <div class="ad-body">
+                <div class="ad-body-title">2026开门红决战冲刺令</div>
+                <div class="ad-body-desc">开门红收官倒计时！长险目标达成率超120%的团队可获"开门红先锋"称号。额外奖励海外游学名额，全员冲刺最后一周！</div>
+                <div class="ad-body-footer">
+                  <span class="ad-tag" style="color:#dc2626;background:#fef2f2;">冲刺通知</span>
+                  <span class="ad-link">查看详情 →</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="notice-dots">
+          <div class="notice-dot active" onclick="goToSlide(0)"></div>
+          <div class="notice-dot" onclick="goToSlide(1)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Entry -->
+    <div class="sidebar-quick-section">
+      <div class="sidebar-right-header">快捷入口</div>
+    <div class="quick-grid-ai">
+      <div class="quick-item-ai">
+        <div class="quick-icon-ai"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M3 9h18"/></svg></div>
+        <div class="quick-label-ai">展厅管理</div>
+      </div>
+      <div class="quick-item-ai">
+        <div class="quick-icon-ai"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 2v4M16 2v4M2 10h20"/></svg></div>
+        <div class="quick-label-ai">添平安<br/>系列活动</div>
+      </div>
+      <div class="quick-item-ai">
+        <div class="quick-icon-ai"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M12 2a5 5 0 015 5c0 3-5 8-5 8s-5-5-5-8a5 5 0 015-5z"/><path d="M4 20c0-2 3.5-3 8-3s8 1 8 3"/></svg></div>
+        <div class="quick-label-ai">医健活动</div>
+      </div>
+      <div class="quick-item-ai">
+        <div class="quick-icon-ai"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/><path d="M16 11l2 2 4-4"/></svg></div>
+        <div class="quick-label-ai">智能管家</div>
+      </div>
+      <div class="quick-item-ai">
+        <div class="quick-icon-ai"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg></div>
+        <div class="quick-label-ai">DO调研</div>
+      </div>
+      <div class="quick-item-ai">
+        <div class="quick-icon-ai"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h10M7 12h10M7 17h6"/></svg></div>
+        <div class="quick-label-ai">常用清单</div>
+      </div>
+      <div class="quick-item-ai">
+        <div class="quick-icon-ai"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg></div>
+        <div class="quick-label-ai">报备晋升</div>
+      </div>
+      <div class="quick-item-ai">
+        <div class="quick-icon-ai"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="7" r="3"/><path d="M3 19c0-3 3-5 6-5 1.5 0 2.8.4 3.8 1.2"/><path d="M14 19c0-3 2-5 5-5"/></svg></div>
+        <div class="quick-label-ai">架构图</div>
+      </div>
+      <div class="quick-item-ai">
+        <div class="quick-icon-ai"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></div>
+        <div class="quick-label-ai">产品板块</div>
+      </div>
+    </div>
+    </div><!-- end sidebar-quick-section -->
+  </div>
+
+</div>
+
+</div>
+
+
+<div class="fullscreen-overlay" id="fsOverlay" onclick="closeFullscreen()"></div>
+
+<script>
+function toggleSidebar() {
+  document.querySelector('.sidebar-left').classList.toggle('collapsed');
+}
+
+function newChat() {
+  const msgs = document.querySelector('.chat-messages');
+  if (msgs) {
+    // Keep only the welcome message
+    const allRows = msgs.querySelectorAll('.msg-row');
+    allRows.forEach((row, i) => { if (i > 0) row.remove(); });
+  }
+  // Deselect active chat
+  document.querySelectorAll('.chat-item').forEach(c => c.classList.remove('active'));
+}
+
+var aiAvatarSrc = document.querySelector('.msg-avatar.ai img') ? document.querySelector('.msg-avatar.ai img').src : '';
+
+function isPathQuery(text) {
+  var t = text.trim();
+  return t.indexOf('达成路径') !== -1 || t.indexOf('规划达成路径') !== -1;
+}
+
+function appendUserMsg(text) {
+  var msgs = document.querySelector('.chat-messages');
+  var row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML = '<div class="msg-bubble user-bubble">' + text + '</div>' +
+    '<div class="msg-avatar user-av"><svg width="14" height="14" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg></div>';
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function appendPathResponse() {
+  var msgs = document.querySelector('.chat-messages');
+  var row = document.createElement('div');
+  row.className = 'msg-row path-card-row';
+  row.innerHTML = '<div class="msg-avatar ai"><img src="' + aiAvatarSrc + '" alt="助手"/></div>' +
+    '<div class="msg-bubble ai-bubble">' +
+      '<div class="path-response-header">请选择您要规划的路径维度：</div>' +
+      '<div class="path-options-wrap">' +
+        '<div class="path-option" onclick="selectPathOption(this)"><div class="path-option-dot"><div class="path-option-dot-inner"></div></div><div class="path-option-label">产品</div></div>' +
+        '<div class="path-option" onclick="selectPathOption(this)"><div class="path-option-dot"><div class="path-option-dot-inner"></div></div><div class="path-option-label">客户</div></div>' +
+        '<div class="path-option" onclick="selectPathOption(this)"><div class="path-option-dot"><div class="path-option-dot-inner"></div></div><div class="path-option-label">队伍</div></div>' +
+      '</div>' +
+    '</div>';
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function triggerPathPlanning() {
+  appendUserMsg('帮我规划达成路径');
+  setTimeout(function(){ appendPathResponse(); }, 400);
+}
+
+function sendMessage() {
+  var input = document.getElementById('chatInput');
+  var text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  appendUserMsg(text);
+  if (isPathQuery(text)) {
+    setTimeout(function(){ appendPathResponse(); }, 400);
+  }
+}
+
+var selectedPathLabel = '';
+function fadeOutCard(el) {
+  if (!el) return;
+  el.style.transition = 'opacity 1s ease-out';
+  el.style.opacity = '0';
+  setTimeout(function(){
+    el.style.transition = 'max-height 0.8s ease, margin 0.8s ease';
+    el.style.maxHeight = el.scrollHeight + 'px';
+    // Force reflow
+    el.offsetHeight;
+    el.style.maxHeight = '0';
+    el.style.overflow = 'hidden';
+    el.style.marginBottom = '0';
+  }, 1000);
+  setTimeout(function(){ el.remove(); }, 1900);
+}
+
+function selectPathOption(el) {
+  var wrap = el.closest('.path-options-wrap');
+  wrap.querySelectorAll('.path-option').forEach(function(o){ o.classList.remove('selected'); });
+  el.classList.add('selected');
+  
+  // Show user message with selected option
+  var label = el.querySelector('.path-option-label').textContent;
+  selectedPathLabel = label;
+
+  // Hide the path selection card
+  var pathCard = el.closest('.path-card-row');
+  fadeOutCard(pathCard);
+
+  appendUserBubble('帮我规划' + label + '达成路径');
+  
+  // Trigger NBEV follow-up after a short delay
+  if (!document.querySelector('.nbev-card-added')) {
+    setTimeout(function(){ appendNbevCard(); }, 600);
+  }
+}
+
+function appendNbevCard() {
+  var msgs = document.querySelector('.chat-messages');
+  var row = document.createElement('div');
+  row.className = 'msg-row nbev-card-added';
+  row.innerHTML = '<div class="msg-avatar ai"><img src="' + aiAvatarSrc + '" alt="助手"/></div>' +
+    '<div class="msg-bubble ai-bubble">' +
+      '<div class="path-response-header">请确认您的NBEV目标值：</div>' +
+      '<div class="path-options-wrap">' +
+        '<div class="path-option" onclick="selectNbevOption(this, \'assigned\')">' +
+          '<div class="path-option-dot"><div class="path-option-dot-inner"></div></div>' +
+          '<div class="path-option-label">深圳市机构下发的目标值300万</div>' +
+        '</div>' +
+        '<div class="nbev-input-wrap" onclick="this.querySelector(\'input\').focus()">' +
+          '<div class="path-option-dot"><div class="path-option-dot-inner"></div></div>' +
+          '<div class="path-option-label" style="flex-shrink:0;">自定义目标</div>' +
+          '<input class="nbev-input" type="text" inputmode="decimal" placeholder="请输入" oninput="onNbevInput(this)" onfocus="selectNbevCustom(this)"/>' +
+          '<span class="nbev-unit">万</span>' +
+          '<button class="nbev-confirm-btn" onclick="confirmNbevCustom(event)">确认</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+var userNbevTarget = 300; // default assigned value
+
+function selectNbevOption(el, type) {
+  var wrap = el.closest('.msg-bubble');
+  wrap.querySelectorAll('.path-option').forEach(function(o){ o.classList.remove('selected'); });
+  var inputWrap = wrap.querySelector('.nbev-input-wrap');
+  inputWrap.classList.remove('has-value');
+  inputWrap.classList.remove('confirmed');
+  var input = wrap.querySelector('.nbev-input');
+  input.value = '';
+  input.readOnly = false;
+  var btn = inputWrap.querySelector('.nbev-confirm-btn');
+  if (btn) btn.innerHTML = '确认';
+  el.classList.add('selected');
+  
+  userNbevTarget = 300;
+
+  // Hide the NBEV card
+  var nbevRow = el.closest('.nbev-card-added');
+  fadeOutCard(nbevRow);
+
+  appendUserBubble('NBEV目标为300万');
+  setTimeout(function(){ appendThinkingCard(); }, 500);
+}
+
+
+function confirmNbevCustom(e) {
+  e.stopPropagation();
+  var wrap = e.target.closest('.nbev-input-wrap');
+  var input = wrap.querySelector('.nbev-input');
+  if (!input.value.trim()) return;
+  
+  // Lock the selection
+  wrap.classList.add('confirmed');
+  input.readOnly = true;
+  
+  // Update button text to checkmark
+  e.target.innerHTML = '✓ 已选';
+  
+  // Deselect option 1 if it was selected
+  var bubble = wrap.closest('.msg-bubble');
+  bubble.querySelectorAll('.path-option').forEach(function(o){ o.classList.remove('selected'); });
+  
+  userNbevTarget = parseFloat(input.value) || 300;
+  var customVal = input.value;
+
+  // Hide the NBEV card
+  var nbevRow = wrap.closest('.nbev-card-added');
+  fadeOutCard(nbevRow);
+  
+  // Show user message with custom value
+  appendUserBubble('NBEV目标为' + customVal + '万');
+  setTimeout(function(){ appendThinkingCard(); }, 500);
+}
+
+
+function selectNbevCustom(input) {
+  var wrap = input.closest('.msg-bubble');
+  wrap.querySelectorAll('.path-option').forEach(function(o){ o.classList.remove('selected'); });
+  input.closest('.nbev-input-wrap').classList.add('has-value');
+}
+
+function onNbevInput(input) {
+  var wrap = input.closest('.nbev-input-wrap');
+  var bubble = input.closest('.msg-bubble');
+  bubble.querySelectorAll('.path-option').forEach(function(o){ o.classList.remove('selected'); });
+  if (input.value.trim()) {
+    wrap.classList.add('has-value');
+  } else {
+    wrap.classList.remove('has-value');
+  }
+}
+
+function openFullscreenTab(panelType) {
+  const panel = panelType === 'biz' 
+    ? document.querySelector('.panel-biz') 
+    : document.querySelector('.panel-hr');
+  if (!panel) return;
+  const w = window.open('', '_blank');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + (panelType === 'biz' ? '经营数据看板' : '人力看板') + ' - 全屏</title>');
+  w.document.write('<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:"Noto Sans SC",-apple-system,sans-serif;background:#f8fafc;padding:32px;color:#1e293b;}.panel-clone{background:#fff;border-radius:12px;padding:24px 32px;box-shadow:0 4px 12px rgba(0,0,0,0.08);max-width:1200px;margin:0 auto;}.panel-clone .chart-area-db{height:300px;}.panel-clone .kpi-card-value{font-size:24px;}.panel-clone .hr-stat-value{font-size:18px;}.panel-clone svg.chart-svg{width:100%;height:100%;}.panel-clone .grid-line{stroke:#f0f0f0;stroke-width:1;}.panel-clone .panel-fullscreen-btn{display:none;}.kpi-row-db{display:flex;gap:8px;margin-bottom:8px;}.kpi-card{flex:1;background:#f8fafc;border-radius:8px;padding:8px 10px;}.kpi-card-label{font-size:12px;color:#64748b;display:flex;align-items:center;gap:6px;margin-bottom:4px;}.kpi-card-dot{width:7px;height:7px;border-radius:50%;display:inline-block;}.kpi-card-dot.orange{background:#f97316;}.kpi-card-dot.teal{background:#0d9488;}.kpi-card-value{font-size:18px;font-weight:700;}.kpi-card-unit{font-size:12px;font-weight:400;color:#94a3b8;}.panel-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #f1f5f9;}.icon-wrap{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;}.icon-wrap.biz-icon{background:#fff7ed;}.icon-wrap.hr-icon{background:#eff6ff;}.chart-section{margin-top:2px;}.chart-header{display:flex;align-items:center;gap:12px;margin-bottom:4px;}.chart-legend{display:flex;align-items:center;gap:5px;font-size:12px;color:#64748b;}.chart-legend-dot{width:7px;height:7px;border-radius:50%;display:inline-block;}.chart-filter-btn{margin-left:auto;padding:3px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;color:#64748b;background:#fff;cursor:pointer;}.chart-area-db{position:relative;height:300px;margin:4px 0;}.chart-x-axis-db{display:flex;justify-content:space-between;color:#94a3b8;font-size:11px;padding-top:6px;}.hr-stat-grid{display:flex;gap:4px;margin-bottom:4px;}.hr-stat-card{flex:1;background:#f8fafc;border-radius:8px;padding:6px 10px;text-align:center;}.hr-stat-label{font-size:10px;color:#94a3b8;margin-bottom:1px;}.hr-stat-value{font-size:14px;font-weight:700;}.hr-stat-sub{font-size:9px;color:#94a3b8;margin-top:1px;}.radar-section{padding-top:4px;border-top:1px solid #f1f5f9;display:flex;flex-direction:column;align-items:center;}.radar-stats{display:flex;justify-content:space-around;width:100%;margin-top:2px;}.radar-stat-item{text-align:center;}.radar-stat-label{font-size:9px;color:#94a3b8;}.radar-stat-val{font-size:12px;font-weight:600;margin-top:1px;}</style>');
+  w.document.write('</head><body><div class="panel-clone">' + panel.innerHTML + '</div></body></html>');
+  w.document.close();
+}
+
+let isClassicMode = false;
+const aiContent = {};
+
+function toggleVersion() {
+  const label = document.getElementById('versionLabel');
+  const appBody = document.querySelector('.app-body');
+  
+  if (!isClassicMode) {
+    // Save AI content
+    aiContent.html = appBody.innerHTML;
+    
+    // Switch to classic
+    appBody.innerHTML = '<div id="classicView" style="flex:1;overflow-y:auto;background:#f0f2f5;"></div>';
+    const classicView = document.getElementById('classicView');
+    
+    // Create a scoped classic page
+    const shadow = classicView.attachShadow({mode: 'open'});
+    shadow.innerHTML = `<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", sans-serif;
+    background: #f0f2f5;
+    color: #333;
+    font-size: 14px;
+    min-width: 1200px;
+  }
+
+  /* ===== TOP NAV ===== */
+  .top-nav {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    height: 48px;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 8px; margin-right: 32px; }
+  .nav-logo-icon {
+    width: 28px; height: 28px; background: #fff; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; color: #1a1a2e; font-size: 16px;
+  }
+  .nav-logo-text { font-size: 16px; font-weight: 600; letter-spacing: 1px; }
+  .nav-logo-sub { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: -2px; }
+  .nav-menu { display: flex; flex: 1; }
+  .nav-menu a {
+    color: rgba(255,255,255,0.85); text-decoration: none;
+    padding: 0 16px; height: 48px;
+    display: flex; align-items: center; font-size: 14px;
+    transition: all 0.2s; position: relative;
+  }
+  .nav-menu a:hover, .nav-menu a.active { color: #fff; background: rgba(255,255,255,0.1); }
+  .nav-menu a.active::after {
+    content: ''; position: absolute; bottom: 0; left: 16px; right: 16px;
+    height: 2px; background: #4fc3f7;
+  }
+  .nav-right { display: flex; align-items: center; gap: 16px; color: rgba(255,255,255,0.7); }
+  .nav-right-icon { width: 20px; height: 20px; cursor: pointer; opacity: 0.7; }
+  .nav-avatar { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .nav-avatar-circle {
+    width: 28px; height: 28px; border-radius: 50%; background: #4fc3f7;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ===== BANNER: simple gradient, no images ===== */
+  .banner {
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 160px;
+    background: linear-gradient(to right, #4dbce9 0%, #7aceed 25%, #a3def3 50%, #c8ebf7 75%, #e8f4fb 100%);
+    border-radius: 4px;
+  }
+  .banner-outer {
+    width: 100%;
+    background: #f0f2f5;
+    padding: 16px 0 0 0;
+  }
+
+  /* ===== PAGE LAYOUT ===== */
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+
+  .location-row {
+    display: flex; align-items: center;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #e8e8e8;
+    margin-bottom: 16px;
+  }
+  .location-icon { color: #1976d2; margin-right: 4px; font-size: 14px; }
+  .location-text { color: #1976d2; font-size: 14px; font-weight: 500; }
+  .location-right { margin-left: auto; }
+  .tab-item { color: #1976d2; cursor: pointer; padding: 4px 0; font-size: 14px; }
+
+  /* ===== MAIN 2-COLUMN ===== */
+  .main-body {
+    display: flex; gap: 16px; padding: 16px 0; background: #f0f2f5;
+    align-items: stretch;
+  }
+
+  /* LEFT CARD */
+  .left-card {
+    flex: 1; background: #fff; border-radius: 4px; padding: 20px;
+    display: flex; flex-direction: column;
+  }
+
+  .kpi-row { display: flex; align-items: center; gap: 40px; margin-bottom: 4px; }
+  .kpi-item { display: flex; flex-direction: column; gap: 4px; }
+  .kpi-label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #666; }
+  .kpi-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .kpi-dot.orange { background: #f5a623; }
+  .kpi-dot.green { background: #4caf50; }
+  .kpi-value { font-size: 13px; color: #999; padding-left: 14px; }
+
+  .filter-btn {
+    padding: 4px 12px; border: 1px solid #d9d9d9; border-radius: 4px;
+    font-size: 12px; color: #666; background: #fff; cursor: pointer;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .filter-btn::after { content: '▾'; font-size: 10px; }
+
+  .chart-area { position: relative; height: 200px; margin: 12px 0; }
+  .chart-x-axis {
+    display: flex; justify-content: space-between;
+    padding: 8px 0 14px 0; color: #999; font-size: 12px;
+    border-bottom: 1px solid #e8e8e8;
+  }
+
+  /* HR section */
+  .hr-section { margin-top: 16px; padding-top: 14px; }
+  .hr-grid { display: flex; align-items: stretch; }
+  .hr-col { display: flex; flex-direction: column; gap: 10px; }
+  .hr-col-current {
+    min-width: 120px; padding-right: 24px;
+    border-right: 1px solid #e0e0e0;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
+  }
+  .hr-label-row { display: flex; align-items: center; gap: 6px; }
+  .hr-dot { width: 8px; height: 8px; border-radius: 50%; background: #1976d2; flex-shrink: 0; }
+  .hr-label-blue { font-size: 13px; color: #1976d2; }
+  .hr-value-right { font-size: 13px; color: #666; text-align: right; }
+  .hr-col-mid {
+    min-width: 130px; padding-left: 24px; padding-right: 24px;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+  }
+  .hr-col-rate {
+    min-width: 110px; padding-left: 10px;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+  }
+  .hr-text { font-size: 13px; color: #666; }
+
+  /* Bottom split: 2/3 + 1/3 */
+  .bottom-split {
+    display: flex; gap: 0; margin-top: 20px;
+    border-top: 1px solid #f0f0f0; padding-top: 16px; flex: 1;
+  }
+  .bottom-left { flex: 2; padding-right: 20px; border-right: 1px solid #f0f0f0; }
+  .bottom-right {
+    flex: 1; padding-left: 20px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+
+  .chart-tabs-row { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+  .chart-tab-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .chart-tab-dot.blue { background: #1976d2; }
+  .chart-tab-dot.orange2 { background: #f5a623; }
+  .chart-tab-label { font-size: 13px; color: #666; }
+
+  .monthly-chart { height: 150px; position: relative; margin: 8px 0; }
+  .month-axis {
+    display: flex; justify-content: space-between;
+    color: #999; font-size: 12px; padding: 6px 0;
+  }
+  .chart-note { font-size: 11px; color: #999; margin-top: 6px; }
+
+  /* RIGHT COLUMN */
+  .right-col {
+    width: 300px; flex-shrink: 0;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .right-card-top, .right-card-bottom {
+    background: #fff; border-radius: 4px; padding: 20px;
+  }
+  .right-card-bottom {
+    flex: 1;
+  }
+  .right-title {
+    font-size: 16px; font-weight: 600; color: #333;
+    padding-bottom: 14px; border-bottom: 1px solid #f0f0f0; margin-bottom: 16px;
+  }
+  .quick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px 28px; }
+  .quick-item {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 8px; cursor: pointer; transition: transform 0.2s;
+  }
+  .quick-item:hover { transform: translateY(-2px); }
+  .quick-icon {
+    width: 44px; height: 44px; border-radius: 8px; background: #f0f5ff;
+    display: flex; align-items: center; justify-content: center; color: #1976d2;
+  }
+  .quick-label { font-size: 12px; color: #666; text-align: center; white-space: nowrap; }
+
+  /* Right bottom card: blank with matching title bar */
+  .right-card-bottom-bar {
+    height: 14px;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 14px;
+  }
+
+  .footer {
+    background: #fff; padding: 16px 0; border-top: 1px solid #e8e8e8;
+    display: flex; justify-content: center; gap: 40px; color: #666; font-size: 13px;
+  }
+  .footer a { color: #666; text-decoration: none; cursor: pointer; }
+  .footer a:hover { color: #1976d2; }
+
+  .chart-svg { width: 100%; height: 100%; }
+  .grid-line { stroke: #f0f0f0; stroke-width: 1; }
+</style>
+
+<!-- BANNER -->
+<div class="banner-outer">
+  <div class="banner"></div>
+</div>
+
+<div class="page-container">
+  <!-- MAIN BODY -->
+  <div class="main-body">
+
+    <!-- ========== LEFT CARD ========== -->
+    <div class="left-card">
+      <!-- Location row inside left card -->
+      <div class="location-row">
+        <span class="location-icon">📍</span>
+        <span class="location-text">浙江温州市</span>
+        <div class="location-right">
+          <span class="tab-item">个险</span>
+        </div>
+      </div>
+
+      <!-- KPI + 筛选 -->
+      <div class="kpi-row">
+        <div class="kpi-item">
+          <div class="kpi-label"><span class="kpi-dot orange"></span> FYP</div>
+          <div class="kpi-value">- 万元</div>
+        </div>
+        <div class="kpi-item">
+          <div class="kpi-label"><span class="kpi-dot green"></span> NBEV</div>
+          <div class="kpi-value">- 万元</div>
+        </div>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:20px;">
+          <div class="filter-btn">筛选</div>
+        </div>
+      </div>
+
+      <!-- Line Chart -->
+      <div class="chart-area">
+        <svg class="chart-svg" viewBox="0 0 600 180">
+          <line x1="0" y1="36" x2="600" y2="36" class="grid-line" stroke-dasharray="3,3"/>
+          <line x1="0" y1="72" x2="600" y2="72" class="grid-line" stroke-dasharray="3,3"/>
+          <line x1="0" y1="108" x2="600" y2="108" class="grid-line" stroke-dasharray="3,3"/>
+          <line x1="0" y1="144" x2="600" y2="144" class="grid-line" stroke-dasharray="3,3"/>
+          <line x1="0" y1="175" x2="600" y2="175" stroke="#e0e0e0" stroke-width="1"/>
+        </svg>
+      </div>
+      <div class="chart-x-axis">
+        <span>4月1日</span><span>4月5日</span><span>4月10日</span><span>4月15日</span><span>4月20日</span><span>4月25日</span><span>4月30日</span>
+      </div>
+
+      <!-- HR 3-col -->
+      <div class="hr-section">
+        <div class="hr-grid">
+          <div class="hr-col hr-col-current">
+            <div class="hr-label-row"><span class="hr-dot"></span><span class="hr-label-blue">当前人力</span></div>
+            <div class="hr-value-right">- 人</div>
+          </div>
+          <div class="hr-col hr-col-mid">
+            <div class="hr-text">新增人力: -人</div>
+            <div class="hr-text">脱落人力: -人</div>
+          </div>
+          <div class="hr-col hr-col-rate">
+            <div class="hr-text">增员率: 0%</div>
+            <div class="hr-text">脱落率: 0%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM SPLIT: 2/3 chart | 1/3 radar -->
+      <div class="bottom-split">
+        <!-- LEFT 2/3 -->
+        <div class="bottom-left">
+          <div class="chart-tabs-row">
+            <div style="display:flex;align-items:center;gap:4px;">
+              <span class="chart-tab-dot blue"></span>
+              <span class="chart-tab-label">当月数据</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;">
+              <span class="chart-tab-dot orange2"></span>
+              <span class="chart-tab-label">去年同期</span>
+            </div>
+            <div style="margin-left:auto;">
+              <div class="filter-btn">图表</div>
+            </div>
+          </div>
+          <div class="monthly-chart">
+            <svg class="chart-svg" viewBox="0 0 500 130">
+              <line x1="0" y1="26" x2="500" y2="26" class="grid-line" stroke-dasharray="3,3"/>
+              <line x1="0" y1="52" x2="500" y2="52" class="grid-line" stroke-dasharray="3,3"/>
+              <line x1="0" y1="78" x2="500" y2="78" class="grid-line" stroke-dasharray="3,3"/>
+              <line x1="0" y1="104" x2="500" y2="104" class="grid-line" stroke-dasharray="3,3"/>
+              <line x1="0" y1="125" x2="500" y2="125" stroke="#e0e0e0" stroke-width="1"/>
+            </svg>
+          </div>
+          <div class="month-axis">
+            <span>1月</span><span>2月</span><span>3月</span><span>4月</span><span>5月</span><span>6月</span>
+            <span>7月</span><span>8月</span><span>9月</span><span>10月</span><span>11月</span><span>12月</span>
+          </div>
+          <div class="chart-note">注: 当前/新增/脱落人力更新于半小时前</div>
+        </div>
+
+        <!-- RIGHT 1/3: radar -->
+        <div class="bottom-right">
+          <!-- Tabs above radar -->
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;width:100%;font-size:12px;color:#666;">
+            <div style="display:flex;align-items:center;gap:3px;">
+              <span class="chart-tab-dot blue" style="width:6px;height:6px;"></span>
+              <span>当月数据</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:3px;">
+              <span class="chart-tab-dot orange2" style="width:6px;height:6px;"></span>
+              <span>去年同期</span>
+            </div>
+            <div style="margin-left:auto;">
+              <span style="border:1px solid #d9d9d9;border-radius:3px;padding:2px 8px;font-size:11px;cursor:pointer;">图表 ▾</span>
+            </div>
+          </div>
+
+          <!-- Radar -->
+          <svg width="220" height="190" viewBox="0 0 220 190" style="margin:0 auto;">
+            <g transform="translate(110,90)">
+              <polygon points="0,-65  62,-20  38,53  -38,53  -62,-20" fill="none" stroke="#e8e8e8" stroke-width="0.8"/>
+              <polygon points="0,-43  41,-13  25,35  -25,35  -41,-13" fill="none" stroke="#e8e8e8" stroke-width="0.6"/>
+              <polygon points="0,-22  21,-7  13,18  -13,18  -21,-7" fill="none" stroke="#e8e8e8" stroke-width="0.4"/>
+              <polygon points="0,-8  8,-3  5,7  -5,7  -8,-3" fill="rgba(200,190,160,0.15)" stroke="#d4c89a" stroke-width="1.5"/>
+            </g>
+            <text x="110" y="12" text-anchor="middle" font-size="10" fill="#999">钻石人力占比</text>
+            <text x="110" y="24" text-anchor="middle" font-size="13" fill="#999">0%</text>
+            <text x="184" y="72" text-anchor="start" font-size="10" fill="#999">钻石会员占比</text>
+            <text x="184" y="84" text-anchor="start" font-size="13" fill="#999">0%</text>
+            <text x="0" y="72" text-anchor="start" font-size="10" fill="#999">亲保有效</text>
+            <text x="0" y="83" text-anchor="start" font-size="10" fill="#999">活动率</text>
+            <text x="0" y="96" text-anchor="start" font-size="13" fill="#999">0%</text>
+          </svg>
+
+          <!-- Bottom stats -->
+          <div style="display:flex;justify-content:space-around;width:100%;margin-top:8px;text-align:center;">
+            <div>
+              <div style="font-size:11px;color:#999;">人均长险件数</div>
+              <div style="font-size:14px;color:#333;margin-top:2px;">-件</div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:#999;">长险件均FYP</div>
+              <div style="font-size:14px;color:#333;margin-top:2px;">-元</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== RIGHT COLUMN ========== -->
+    <div class="right-col">
+      <!-- Card 1: 快捷入口 -->
+      <div class="right-card-top">
+        <div class="right-title">快捷入口</div>
+        <div class="quick-grid">
+          <div class="quick-item">
+            <div class="quick-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M3 9h18"/></svg></div>
+            <div class="quick-label">展厅管理</div>
+          </div>
+          <div class="quick-item">
+            <div class="quick-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 2v4M16 2v4M2 10h20"/></svg></div>
+            <div class="quick-label">添平安系列活动</div>
+          </div>
+          <div class="quick-item">
+            <div class="quick-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2"><path d="M12 2a5 5 0 0 1 5 5c0 3-5 8-5 8s-5-5-5-8a5 5 0 0 1 5-5z"/><path d="M4 20c0-2 3.5-3 8-3s8 1 8 3"/></svg></div>
+            <div class="quick-label">医健活动</div>
+          </div>
+          <div class="quick-item">
+            <div class="quick-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/><path d="M16 11l2 2 4-4"/></svg></div>
+            <div class="quick-label">智能管家</div>
+          </div>
+          <div class="quick-item">
+            <div class="quick-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg></div>
+            <div class="quick-label">DO调研</div>
+          </div>
+          <div class="quick-item">
+            <div class="quick-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h10M7 12h10M7 17h6"/></svg></div>
+            <div class="quick-label">常用清单</div>
+          </div>
+          <div class="quick-item">
+            <div class="quick-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/><path d="M12 3v2M12 19v2"/></svg></div>
+            <div class="quick-label">报备晋升</div>
+          </div>
+          <div class="quick-item">
+            <div class="quick-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="7" r="3"/><path d="M3 19c0-3 3-5 6-5 1.5 0 2.8.4 3.8 1.2"/><path d="M14 19c0-3 2-5 5-5"/></svg></div>
+            <div class="quick-label">架构图</div>
+          </div>
+          <div class="quick-item">
+            <div class="quick-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></div>
+            <div class="quick-label">产品板块</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: blank bottom card with matching divider -->
+      <div class="right-card-bottom">
+        <div class="right-card-bottom-bar"></div>
+        <!-- intentionally blank -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <a href="#">中国平安</a>
+    <a href="#">调研通</a>
+    <a href="#">E行销网</a>
+    <a href="#">IT问题上报</a>
+    <a href="#">报表门户</a>
+  </div>
+</div>
+
+`;
+    
+    label.textContent = '切换AI助手';
+    isClassicMode = true;
+
+    // Update the main nav for classic mode
+    document.getElementById('versionLabel').textContent = '切换AI助手';
+    document.querySelector('.nav-menu a.active').textContent = '首页';
+  } else {
+    // Restore AI content
+    appBody.innerHTML = aiContent.html;
+    label.textContent = '切换经典版';
+    isClassicMode = false;
+
+    // Restore AI nav
+    document.getElementById('versionLabel').textContent = '切换经典版';
+    document.querySelector('.nav-menu a.active').textContent = 'AI 首页';
+  }
+}
+
+// Helper: append a user message bubble
+function appendUserBubble(text) {
+  var msgs = document.querySelector('.chat-messages');
+  var row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML = '<div class="msg-bubble user-bubble">' + text + '</div>' +
+    '<div class="msg-avatar user-av"><svg width="14" height="14" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg></div>';
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// Notice carousel
+var currentSlide = 0;
+function slideNotice(dir) {
+  var slides = document.querySelectorAll('.notice-slide');
+  currentSlide = (currentSlide + dir + slides.length) % slides.length;
+  updateSlide();
+}
+function goToSlide(idx) {
+  currentSlide = idx;
+  updateSlide();
+}
+function updateSlide() {
+  document.getElementById('noticeTrack').style.transform = 'translateX(-' + (currentSlide * 100) + '%)';
+  document.querySelectorAll('.notice-dot').forEach(function(d, i) {
+    d.classList.toggle('active', i === currentSlide);
+  });
+}
+
+// Recommend question click
+function askRecommend(el, triggerPath) {
+  var text = el.childNodes[0].textContent.trim();
+  appendUserMsg(text);
+  document.getElementById('recommendSection').style.display = 'none';
+  if (triggerPath) {
+    setTimeout(function(){ appendPathResponse(); }, 400);
+  }
+}
+
+// Vertical roll recommend scroll (3 items per page, 5s interval)
+var recPage = 0;
+var recTimer = setInterval(function() {
+  var track = document.getElementById('recommendTrack');
+  if (!track) { clearInterval(recTimer); return; }
+  var pages = track.querySelectorAll('.recommend-page');
+  if (pages.length <= 1) return;
+  recPage = (recPage + 1) % pages.length;
+  track.style.transform = 'translateY(-' + (recPage * 34) + 'px)';
+}, 5000);
+
+// AI Thinking card
+var thinkingTexts = [
+  '正在分析您的NBEV目标与当前团队产能数据...',
+  '对比深圳市机构历史达成率，识别关键差距因子...',
+  '正在匹配产品组合策略：重疾险+年金险+医疗险的最优配比...',
+  '基于352人团队规模，计算人均产能要求与分层目标...',
+  '评估钻石会员客户转化潜力，预估高净值客户贡献占比...',
+  '正在生成增员与留存双轨并行方案，优化团队结构...',
+  '综合分析客户画像分布，匹配差异化营销场景...',
+  '整合季度活动日历，规划关键节点冲刺节奏...',
+  '正在生成完整的达成路径规划方案，请稍候...'
+];
+
+function appendThinkingCard() {
+  if (document.querySelector('.thinking-card-added')) return;
+  var msgs = document.querySelector('.chat-messages');
+  var row = document.createElement('div');
+  row.className = 'msg-row thinking-card-added';
+  row.innerHTML = '<div class="msg-avatar ai"><img src="' + aiAvatarSrc + '" alt="助手"/></div>' +
+    '<div class="msg-bubble ai-bubble tool-bubble">' +
+      '<div class="thinking-card">' +
+        '<div class="thinking-header">' +
+          '<div class="thinking-spinner" id="thinkingSpinner"></div>' +
+          '<span id="thinkingLabel">思考中...</span>' +
+        '</div>' +
+        '<div class="thinking-body collapsed" id="thinkingBody"></div>' +
+        '<button class="thinking-toggle" id="thinkingToggle" onclick="toggleThinking()">' +
+          '<span id="thinkingToggleText">展开全部</span>' +
+          '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>' +
+        '</button>' +
+      '</div>' +
+    '</div>';
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+  
+  // Start typewriter
+  typewriteThinking(0, 0);
+}
+
+var thinkingCharIndex = 0;
+var thinkingLineIndex = 0;
+var thinkingFullText = '';
+var thinkingExpanded = false;
+
+function typewriteThinking(lineIdx, charIdx) {
+  if (lineIdx >= thinkingTexts.length) {
+    // Done
+    var cursor = document.querySelector('.thinking-body .cursor');
+    if (cursor) cursor.remove();
+    document.getElementById('thinkingSpinner').classList.add('done');
+    document.getElementById('thinkingLabel').textContent = '思考完成';
+    if (selectedPathLabel === '队伍') {
+      setTimeout(function(){ appendTeamProfileCard(); }, 600);
+    }
+    return;
+  }
+  
+  var body = document.getElementById('thinkingBody');
+  if (!body) return;
+  
+  var line = thinkingTexts[lineIdx];
+  
+  if (charIdx === 0 && lineIdx > 0) {
+    thinkingFullText += ' ';
+  }
+  
+  if (charIdx < line.length) {
+    thinkingFullText += line[charIdx];
+    body.innerHTML = thinkingFullText + '<span class="cursor"></span>';
+    
+    // Check if overflow (more than 3 lines)
+    checkThinkingOverflow();
+    
+    // Auto-scroll if collapsed
+    if (!thinkingExpanded) {
+      body.scrollTop = body.scrollHeight;
+    }
+    
+    // Scroll chat to bottom
+    var msgs = document.querySelector('.chat-messages');
+    msgs.scrollTop = msgs.scrollHeight;
+    
+    setTimeout(function() { typewriteThinking(lineIdx, charIdx + 1); }, 30);
+  } else {
+    // Move to next line after a pause
+    setTimeout(function() { typewriteThinking(lineIdx + 1, 0); }, 300);
+  }
+}
+
+function checkThinkingOverflow() {
+  var body = document.getElementById('thinkingBody');
+  var toggle = document.getElementById('thinkingToggle');
+  if (!body || !toggle) return;
+  // Compare scrollHeight vs 3-line height (~4.8em ≈ 67px at 14px base)
+  if (body.scrollHeight > body.clientHeight + 4) {
+    toggle.classList.add('visible');
+  }
+}
+
+function toggleThinking() {
+  var body = document.getElementById('thinkingBody');
+  var toggle = document.getElementById('thinkingToggle');
+  var label = document.getElementById('thinkingToggleText');
+  if (!body) return;
+  
+  thinkingExpanded = !thinkingExpanded;
+  
+  if (thinkingExpanded) {
+    body.classList.remove('collapsed');
+    body.style.maxHeight = body.scrollHeight + 'px';
+    label.textContent = '收起';
+    toggle.classList.add('expanded');
+  } else {
+    body.classList.add('collapsed');
+    body.style.maxHeight = '';
+    label.textContent = '展开全部';
+    toggle.classList.remove('expanded');
+    body.scrollTop = body.scrollHeight;
+  }
+}
+
+
+// ===== Atomic Tool: Team Profile Card =====
+var teamData = {
+  monthLabels: ['11月', '12月', '1月', '2月', '3月', '4月'],
+  levels: [
+    [18, 35, 52, 78, 145],
+    [20, 38, 55, 75, 140],
+    [22, 40, 58, 72, 138],
+    [19, 42, 60, 76, 142],
+    [24, 45, 56, 80, 135],
+    [26, 48, 62, 82, 134]
+  ],
+  nbev:    [386, 412, 445, 398, 437, 463],
+  targets: [400, 420, 450, 430, 450, 460]
+};
+var levelNames  = ['双金钻', '金钻', '银钻', '钻石', '有效活动人力'];
+var levelColors = ['#7c3aed', '#2563eb', '#0891b2', '#10b981', '#94a3b8'];
+var lvClasses   = ['lv5','lv4','lv3','lv2','lv1'];
+
+function appendTeamProfileCard() {
+  if (document.querySelector('.team-profile-added')) return;
+  var msgs = document.querySelector('.chat-messages');
+  var row = document.createElement('div');
+  row.className = 'msg-row team-profile-added';
+
+  row.innerHTML = '<div class="msg-avatar ai"><img src="' + aiAvatarSrc + '" alt="助手"/></div>' +
+    '<div class="msg-bubble ai-bubble tool-bubble">' +
+      '<div style="margin-bottom:6px;font-size:13px;color:var(--text-secondary);">深圳市南山营业区 队伍画像</div>' +
+      '<div class="team-profile-card">' +
+        '<div class="team-profile-header">' +
+          '<div class="team-profile-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg></div>' +
+          '<div class="team-profile-title">队伍画像</div>' +
+          '<div class="team-profile-subtitle">近6个月数据</div>' +
+        '</div>' +
+        '<div class="tp-chart-section">' +
+          '<div class="tp-chart-title">队伍等级构成（人数）</div>' +
+          '<div id="tpTable"></div>' +
+        '</div>' +
+        '<div class="tp-trend-section">' +
+          '<div class="tp-trend-title">NBEV月度达成 vs 目标（万元）</div>' +
+          '<div class="tp-trend-chart" id="tpTrendChart"></div>' +
+          '<div class="tp-trend-labels" id="tpTrendLabels"></div>' +
+          '<div class="tp-trend-legend">' +
+            '<span><span class="tp-trend-legend-dot" style="background:#2563eb;"></span>实际达成</span>' +
+            '<span><span class="tp-trend-legend-line"></span>下发目标</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  renderVbarChart();
+  renderTrendLineChart();
+
+  // Chain: show team achievement estimation after profile
+  setTimeout(function(){ appendTeamAchieveCard(); }, 1200);
+}
+
+function renderVbarChart() {
+  var html = '<table class="tp-table"><thead><tr><th>等级</th>';
+  teamData.monthLabels.forEach(function(m) { html += '<th>' + m + '</th>'; });
+  html += '</tr></thead><tbody>';
+
+  levelNames.forEach(function(name, li) {
+    html += '<tr><td><span class="tp-level-tag"><span class="tp-level-dot" style="background:' + levelColors[li] + ';"></span>' + name + '</span></td>';
+    teamData.levels.forEach(function(row) {
+      html += '<td>' + row[li] + '</td>';
+    });
+    html += '</tr>';
+  });
+
+  // Total row
+  html += '<tr class="tp-row-total"><td>合计</td>';
+  teamData.levels.forEach(function(row) {
+    html += '<td>' + row.reduce(function(a,b){return a+b;},0) + '</td>';
+  });
+  html += '</tr></tbody></table>';
+
+  document.getElementById('tpTable').innerHTML = html;
+}
+
+function renderTrendLineChart() {
+  var vals = teamData.nbev;
+  var tgts = teamData.targets;
+  var all = vals.concat(tgts);
+  var minV = Math.min.apply(null, all) * 0.9;
+  var maxV = Math.max.apply(null, all) * 1.08;
+  var W = 400, H = 100, pad = 12, padR = 12;
+  var cW = W - pad - padR, cH = H - 20;
+
+  function x(i) { return pad + (i / (vals.length - 1)) * cW; }
+  function y(v) { return 10 + (1 - (v - minV) / (maxV - minV)) * cH; }
+
+  // Grid lines
+  var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none">';
+  for (var g = 0; g < 4; g++) {
+    var gy = 10 + (g / 3) * cH;
+    svg += '<line x1="' + pad + '" y1="' + gy + '" x2="' + (W-padR) + '" y2="' + gy + '" stroke="#f0f0f0" stroke-width="0.8" stroke-dasharray="3,3"/>';
+  }
+
+  // Gradient fill under actual line
+  svg += '<defs><linearGradient id="nbevGrad" x1="0" y1="0" x2="0" y2="1">' +
+    '<stop offset="0%" stop-color="#2563eb" stop-opacity="0.12"/>' +
+    '<stop offset="100%" stop-color="#2563eb" stop-opacity="0.01"/>' +
+    '</linearGradient></defs>';
+
+  // Actual values area fill
+  var pts = [];
+  vals.forEach(function(v, i) { pts.push(x(i) + ',' + y(v)); });
+  svg += '<path d="M' + pts.join(' L') + ' L' + x(vals.length-1) + ',' + (10+cH) + ' L' + x(0) + ',' + (10+cH) + ' Z" fill="url(#nbevGrad)"/>';
+
+  // Target dashed line
+  var tPts = [];
+  tgts.forEach(function(v, i) { tPts.push(x(i) + ',' + y(v)); });
+  svg += '<polyline points="' + tPts.join(' ') + '" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,3" stroke-linecap="round"/>';
+
+  // Actual solid line
+  svg += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+
+  // Dots + value labels
+  vals.forEach(function(v, i) {
+    var cx = x(i), cy = y(v);
+    svg += '<circle cx="' + cx + '" cy="' + cy + '" r="3.5" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>';
+    svg += '<text x="' + cx + '" y="' + (cy - 7) + '" text-anchor="middle" font-size="9" font-weight="600" fill="#1e293b">' + v + '</text>';
+  });
+
+  // Target dot labels (smaller)
+  tgts.forEach(function(v, i) {
+    var cx = x(i), cy = y(v);
+    svg += '<circle cx="' + cx + '" cy="' + cy + '" r="2" fill="#f59e0b"/>';
+  });
+
+  svg += '</svg>';
+  document.getElementById('tpTrendChart').innerHTML = svg;
+
+  // Month labels
+  var labels = '';
+  teamData.monthLabels.forEach(function(m) { labels += '<span>' + m + '</span>'; });
+  document.getElementById('tpTrendLabels').innerHTML = labels;
+}
+
+// ===== Atomic Tool: Team Achievement Estimation =====
+var achieveData = {
+  levels: [
+    { name: '双金钻', count: 26, color: '#7c3aed', nbevPer: 8.2 },
+    { name: '金钻',   count: 48, color: '#2563eb', nbevPer: 5.6 },
+    { name: '银钻',   count: 62, color: '#0891b2', nbevPer: 3.4 },
+    { name: '钻石',   count: 82, color: '#10b981', nbevPer: 1.8 },
+    { name: '有效活动人力', count: 134, color: '#94a3b8', nbevPer: 0.6 },
+    { name: '非活动人力', count: 56, color: '#cbd5e1', nbevPer: 0 }
+  ],
+  target: 460
+};
+
+function appendTeamAchieveCard() {
+  if (document.querySelector('.team-achieve-added')) return;
+  var msgs = document.querySelector('.chat-messages');
+  var row = document.createElement('div');
+  row.className = 'msg-row team-achieve-added';
+
+  // Compute totals
+  var total = 0;
+  achieveData.levels.forEach(function(lv) { total += lv.count; });
+
+  // Use user-selected NBEV target, predict 102%-108% of target
+  var target = userNbevTarget || 300;
+  var rate = 1.02 + Math.random() * 0.06; // 102% ~ 108%
+  var predictedNbev = Math.round(target * rate * 10) / 10;
+  var achieveRate = Math.round(predictedNbev / target * 1000) / 10;
+
+  row.innerHTML = '<div class="msg-avatar ai"><img src="' + aiAvatarSrc + '" alt="助手"/></div>' +
+    '<div class="msg-bubble ai-bubble tool-bubble">' +
+      '<div style="margin-bottom:6px;font-size:13px;color:var(--text-secondary);">深圳市南山营业区 队伍达成路径</div>' +
+      '<div class="team-achieve-card">' +
+        '<div class="team-achieve-header">' +
+          '<div class="team-achieve-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path d="M9 12l2 2 4-4"/></svg></div>' +
+          '<div class="team-achieve-title">队伍达成路径</div>' +
+          '<div class="team-achieve-subtitle">当前人力 ' + total + ' 人</div>' +
+        '</div>' +
+        '<div class="ta-pie-section">' +
+          '<div class="ta-pie-wrap" id="taPieChart"></div>' +
+          '<div class="ta-legend" id="taPieLegend"></div>' +
+        '</div>' +
+        '<div class="ta-metrics-row">' +
+          '<div class="ta-metric-card">' +
+            '<div class="ta-metric-label">NBEV目标值</div>' +
+            '<div class="ta-metric-val-row">' +
+              '<span class="ta-metric-val">' + target + '</span>' +
+              '<span class="ta-metric-unit">万元</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="ta-metric-card">' +
+            '<div class="ta-metric-label">预测达成值</div>' +
+            '<div class="ta-metric-val-row">' +
+              '<span class="ta-metric-val primary">' + predictedNbev + '</span>' +
+              '<span class="ta-metric-unit">万元</span>' +
+              '<span class="ta-metric-badge green">✓ ' + achieveRate + '%</span>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="ta-next-steps">' +
+          '<div class="ta-next-label">下一步推荐</div>' +
+          '<div class="ta-next-btns">' +
+            '<div class="ta-next-btn" onclick="retryWithNewTarget()">' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/></svg>' +
+              '调整目标值' +
+            '</div>' +
+            '<div class="ta-next-btn">' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>' +
+              '调整队伍分布' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  renderTaPieChart(total);
+  renderTaPieLegend(total);
+}
+
+function renderTaPieChart(total) {
+  var R = 58, cx = 75, cy = 75, gap = 1.5;
+  var svg = '<svg viewBox="0 0 150 150">';
+  var startAngle = -90;
+
+  achieveData.levels.forEach(function(lv) {
+    var pct = lv.count / total;
+    var angle = pct * 360;
+    // Leave small gap between slices
+    var drawAngle = Math.max(angle - gap, 0.5);
+    var startRad = (startAngle + gap / 2) * Math.PI / 180;
+    var endRad = (startAngle + gap / 2 + drawAngle) * Math.PI / 180;
+    var x1 = cx + R * Math.cos(startRad);
+    var y1 = cy + R * Math.sin(startRad);
+    var x2 = cx + R * Math.cos(endRad);
+    var y2 = cy + R * Math.sin(endRad);
+    var large = drawAngle > 180 ? 1 : 0;
+
+    svg += '<path d="M' + cx + ',' + cy + ' L' + x1 + ',' + y1 +
+           ' A' + R + ',' + R + ' 0 ' + large + ',1 ' + x2 + ',' + y2 +
+           ' Z" fill="' + lv.color + '" opacity="0.85">' +
+           '<animate attributeName="opacity" from="0" to="0.85" dur="0.5s" fill="freeze"/>' +
+           '</path>';
+    startAngle += angle;
+  });
+
+  // Center donut hole
+  svg += '<circle cx="' + cx + '" cy="' + cy + '" r="36" fill="white"/>';
+  svg += '</svg>';
+
+  var wrap = document.getElementById('taPieChart');
+  wrap.innerHTML = svg +
+    '<div class="ta-pie-center">' +
+      '<div class="ta-pie-center-val">' + total + '</div>' +
+      '<div class="ta-pie-center-label">总人力</div>' +
+    '</div>';
+}
+
+function renderTaPieLegend(total) {
+  var html = '';
+  achieveData.levels.forEach(function(lv) {
+    var pct = (lv.count / total * 100).toFixed(1);
+    html += '<div class="ta-legend-item">' +
+      '<div class="ta-legend-dot" style="background:' + lv.color + ';"></div>' +
+      '<div class="ta-legend-name">' + lv.name + '</div>' +
+      '<div class="ta-legend-count">' + lv.count + '人</div>' +
+      '<div class="ta-legend-pct">' + pct + '%</div>' +
+    '</div>';
+  });
+  document.getElementById('taPieLegend').innerHTML = html;
+}
+
+// ===== Retry: Adjust Target Value =====
+function retryWithNewTarget() {
+  appendUserBubble('我想调整目标值');
+  setTimeout(function(){ appendRetryNbevCard(); }, 600);
+}
+
+function appendRetryNbevCard() {
+  var msgs = document.querySelector('.chat-messages');
+  var row = document.createElement('div');
+  row.className = 'msg-row retry-nbev-card';
+  row.innerHTML = '<div class="msg-avatar ai"><img src="' + aiAvatarSrc + '" alt="助手"/></div>' +
+    '<div class="msg-bubble ai-bubble">' +
+      '<div class="path-response-header">请重新设定您的NBEV目标值：</div>' +
+      '<div class="path-options-wrap">' +
+        '<div class="path-option" onclick="selectRetryNbev(this, 300)">' +
+          '<div class="path-option-dot"><div class="path-option-dot-inner"></div></div>' +
+          '<div class="path-option-label">深圳市机构下发的目标值300万</div>' +
+        '</div>' +
+        '<div class="nbev-input-wrap" onclick="this.querySelector(\'input\').focus()">' +
+          '<div class="path-option-dot"><div class="path-option-dot-inner"></div></div>' +
+          '<div class="path-option-label" style="flex-shrink:0;">自定义目标</div>' +
+          '<input class="nbev-input" type="text" inputmode="decimal" placeholder="请输入" oninput="onRetryNbevInput(this)" onfocus="focusRetryNbev(this)"/>' +
+          '<span class="nbev-unit">万</span>' +
+          '<button class="nbev-confirm-btn" onclick="confirmRetryNbev(event)">确认</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function selectRetryNbev(el, val) {
+  userNbevTarget = val;
+  var card = el.closest('.retry-nbev-card');
+  fadeOutCard(card);
+  appendUserBubble('NBEV目标为' + val + '万');
+  setTimeout(function(){ rerunTeamAnalysis(); }, 800);
+}
+
+function focusRetryNbev(input) {
+  var wrap = input.closest('.msg-bubble');
+  wrap.querySelectorAll('.path-option').forEach(function(o){ o.classList.remove('selected'); });
+  input.closest('.nbev-input-wrap').classList.add('has-value');
+}
+
+function onRetryNbevInput(input) {
+  var wrap = input.closest('.nbev-input-wrap');
+  var bubble = input.closest('.msg-bubble');
+  bubble.querySelectorAll('.path-option').forEach(function(o){ o.classList.remove('selected'); });
+  if (input.value.trim()) {
+    wrap.classList.add('has-value');
+  } else {
+    wrap.classList.remove('has-value');
+  }
+}
+
+function confirmRetryNbev(e) {
+  e.stopPropagation();
+  var wrap = e.target.closest('.nbev-input-wrap');
+  var input = wrap.querySelector('.nbev-input');
+  if (!input.value.trim()) return;
+  wrap.classList.add('confirmed');
+  input.readOnly = true;
+  e.target.innerHTML = '✓ 已选';
+  userNbevTarget = parseFloat(input.value) || 300;
+  var val = input.value;
+  var card = wrap.closest('.retry-nbev-card');
+  fadeOutCard(card);
+  appendUserBubble('NBEV目标为' + val + '万');
+  setTimeout(function(){ rerunTeamAnalysis(); }, 800);
+}
+
+function rerunTeamAnalysis() {
+  // Remove previous team profile and achieve cards
+  var old1 = document.querySelector('.team-profile-added');
+  var old2 = document.querySelector('.team-achieve-added');
+  if (old1) old1.remove();
+  if (old2) old2.remove();
+
+  // Also remove old thinking card
+  var oldThink = document.querySelector('.thinking-card-added');
+  if (oldThink) oldThink.remove();
+
+  // Reset flags by clearing the class references
+  thinkingFullText = '';
+  thinkingExpanded = false;
+
+  // Re-show thinking then team cards
+  appendThinkingCard();
+}
+
+</script>
+</body>
+</html>

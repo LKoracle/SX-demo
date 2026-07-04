@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ' *)",
+      "Read(//Users/lk/Documents/ClaudeCode/寿险万能営销/营销规划智能体/原型图/**)",
+      "Read(//Users/lk/Documents/ClaudeCode/寿険万能営銷/営銷規划智能体/原型图/**)",
+      "Bash(ls /Users/lk/Documents/ClaudeCode/)",
+      "Read(//Users/lk/Documents/ClaudeCode/**)",
+      "Bash(find /Users/lk -maxdepth 5 -type d -iname \"*deerflow*\" 2>/dev/null)",
+      "Read(//Users/lk/**)",
+      "Bash(rm -rf /Users/lk/Documents/Deerflow/deer-flow && ls /Users/lk/Documents/Deerflow/)",
+      "Bash(git clone *)",
+      "Bash(docker info *)",
+      "Bash(make config *)",
+      "Bash(make check *)",
+      "Bash(curl -LsSf https://astral.sh/uv/install.sh)",
+      "Bash(sh)",
+      "Bash(brew install *)",
+      "Bash(corepack enable *)",
+      "Bash(pnpm --version)",
+      "Bash(export PATH=\"$HOME/.local/bin:$PATH\")",
+      "Bash(perl -0pi -e \"s/\\\\s*'<span style=\\\\\"font-size:10\\\\.5px;color:#94a3b8;\\\\\">' \\\\+ mLabel \\\\+ '<\\\\/span>' \\\\+\\\\n//g\" PC端20260725版本.html)",
+      "Read(//private/tmp/**)",
+      "Bash(node /tmp/edit3.cjs)",
+      "Bash(node /tmp/edit4.cjs)",
+      "Bash(node /tmp/edit5.cjs)",
+      "Bash(node /tmp/edit6.cjs)",
+      "Bash(cd /Users/lk/Documents/ClaudeCode/寿险万能营销/追踪管理智能体/原型图 *)"
+    ],
+    "additionalDirectories": [
+      "/Users/lk/Documents/Deerflow/deer-flow",
+      "/private/tmp"
+    ]
+  }
+}

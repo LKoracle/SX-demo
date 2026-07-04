@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>营销规划智能体 · 功能架构图</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;background:#EEECEA;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:40px 20px;}
+.page{width:1100px;background:#fff;border-radius:12px;box-shadow:0 4px 28px rgba(0,0,0,.10);padding:40px 44px 32px;}
+.main-title{text-align:center;font-size:24px;font-weight:700;color:#222;letter-spacing:3px;}
+.sub-title{text-align:center;font-size:11px;color:#aaa;margin-top:4px;margin-bottom:28px;}
+.wrap{display:flex;gap:16px;}
+.side{width:130px;flex-shrink:0;display:flex;flex-direction:column;gap:14px;}
+.side-box{border:1px solid #E0DFD9;border-radius:8px;padding:14px 12px;background:transparent;}
+.side-box-title{font-size:12px;font-weight:700;color:#5C6BC0;padding-bottom:6px;border-bottom:2px solid #EDEDEA;margin-bottom:8px;}
+.side-box .nav-item{font-size:11px;color:#888;line-height:2.1;cursor:default;border-bottom:1px solid #F0EFEC;padding-bottom:1px;}
+.side-box .nav-item:last-child{border-bottom:none;}
+.main{flex:1;min-width:0;}
+.arrow{text-align:center;margin:6px 0;line-height:0;}
+.layer-label{font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.tech-tag{display:inline-block;font-size:10px;font-weight:600;padding:3px 12px;border-radius:20px;border:1px solid;margin-left:6px;}
+.tech-tag.tag-purple{color:#7B6CF0;border-color:#D5D0F0;background:#EBE7FB;}
+.tech-tag.tag-green{color:#00B894;border-color:#D4EDDF;background:#E3F7EF;}
+
+.layer-interact{border:1px solid #7986CB;border-radius:10px;padding:16px 20px 18px;background:transparent;box-shadow:0 -4px 12px rgba(92,107,192,.15);}
+.layer-interact .layer-label{color:#5C6BC0;}
+.interact-bar{background:linear-gradient(135deg,#5C6BC0 0%,#7986CB 40%,#9FA8DA 100%);color:#fff;text-align:center;padding:14px 20px;border-radius:8px;font-size:14px;font-weight:500;letter-spacing:1px;box-shadow:0 2px 8px rgba(92,107,192,.22);}
+
+.layer-agent{border:1px solid #E2DFF5;border-radius:10px;padding:16px 20px 18px;background:#FAF8FF;box-shadow:0 -4px 12px rgba(123,108,240,.12);}
+.layer-agent .layer-label{color:#7B6CF0;}
+.agent-four-col{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px;}
+.func-title-box{border-radius:8px;padding:10px 14px;font-size:12.5px;font-weight:700;color:#fff;letter-spacing:.3px;text-align:center;}
+.func-title-box.bg-red{background:linear-gradient(135deg,#E74C3C,#FF6B6B);}
+.func-title-box.bg-purple{background:linear-gradient(135deg,#6C5CE7,#7B6CF0);}
+.func-title-box.bg-blue{background:linear-gradient(135deg,#0984E3,#74B9FF);}
+.func-title-box.bg-green{background:linear-gradient(135deg,#00B894,#55EFC4);}
+.skills-label{font-size:11px;color:#7B6CF0;margin-bottom:8px;margin-top:14px;}
+.skill-unified-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px;}
+.skill-card{border:1px solid #EDEDEA;border-radius:8px;padding:10px 12px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.04);display:flex;flex-direction:column;}
+.skill-card-head{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+.skill-tag{font-size:9px;padding:2px 8px;border-radius:3px;color:#fff;font-weight:700;white-space:nowrap;letter-spacing:.5px;}
+.st-red{background:#FF6B6B;}
+.st-purple{background:#A084F2;}
+.st-blue{background:#0984E3;}
+.st-green{background:#27AE60;}
+.skill-prio{margin-left:auto;font-size:10px;font-weight:600;}
+.skill-prio.p0{color:#FF6B6B;}
+.skill-prio.p1{color:#F0932B;}
+.skill-prio.p2{color:#0984E3;}
+.skill-item{padding:2px 0;}
+.skill-item-name{font-size:11.5px;font-weight:700;color:#444;}
+.skill-item-desc{font-size:10px;color:#aaa;margin-top:1px;line-height:1.4;}
+.skill-card.compact{padding:6px 12px;}
+.skill-card.compact .skill-card-head{margin-bottom:4px;}
+.skill-card.compact .skill-item{padding:1px 0;}
+.skill-card.compact .skill-item-name{font-size:11px;}
+.skill-card.compact .skill-item-desc{font-size:9.5px;margin-top:0;}
+.priority-row{display:flex;justify-content:flex-end;gap:18px;margin-top:12px;font-size:11px;color:#aaa;}
+.prio-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle;}
+.pd0{background:#FF6B6B;}
+.pd1{background:#F0932B;}
+.pd2{background:#0984E3;}
+
+.layer-tools{border:1px solid #D4EDDF;border-radius:10px;padding:16px 20px 18px;background:#F5FCF8;box-shadow:0 -4px 12px rgba(0,184,148,.12);}
+.layer-tools .layer-label{color:#00B894;}
+.tools-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.tools-col{border:1px solid #D4EDDF;border-radius:8px;padding:10px 10px 10px;background:#fff;}
+.tools-col-title{font-size:11px;font-weight:700;color:#00B894;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #E0F0E8;}
+.chips{display:flex;flex-wrap:wrap;gap:4px;}
+.chip{font-size:9px;padding:3px 6px;border-radius:5px;border:1px solid #D4EDDF;background:#F5FCF8;color:#555;box-shadow:0 1px 2px rgba(0,0,0,.03);cursor:default;white-space:nowrap;}
+.chips-split{display:flex;gap:8px;}
+.chips-left,.chips-right{flex:1;display:flex;flex-direction:column;gap:4px;}
+.chips-right{border-left:1px dashed #D4EDDF;padding-left:8px;}
+.chips-left .chip,.chips-right .chip{width:100%;text-align:center;}
+.skill-col-stretch{display:flex;flex-direction:column;gap:10px;}
+.skill-col-stretch .skill-card{flex:1;}
+
+.layer-data{border:1px solid #F0E4C8;border-radius:10px;padding:16px 20px 18px;background:#FFFDF7;box-shadow:0 -4px 12px rgba(225,112,85,.12);}
+.layer-data .layer-label{color:#E17055;}
+.data-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:10px;}
+.data-card{text-align:center;padding:18px 10px 14px;border-radius:10px;border:1px solid #EDEDEA;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+.data-icon{width:40px;height:40px;border-radius:50%;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.di1{background:#DBEAFE;color:#2563EB;}
+.di2{background:#FEF3C7;color:#D97706;}
+.di3{background:#D1FAE5;color:#059669;}
+.di4{background:#EDE9FE;color:#7C3AED;}
+.di5{background:#FCE7F3;color:#DB2777;}
+.di6{background:#FEE2E2;color:#DC2626;}
+.data-name{font-size:12px;font-weight:700;color:#333;}
+.data-desc{font-size:9.5px;color:#aaa;margin-top:3px;line-height:1.5;}
+.footer{text-align:center;margin-top:20px;font-size:9px;color:#ccc;}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="main-title">营销规划智能体 · 功能架构图</div>
+  <div class="sub-title">&nbsp;</div>
+
+  <div class="wrap">
+
+    <div class="side">
+      <div class="side-box">
+        <div class="side-box-title">智能体平台</div>
+        <div class="nav-item">智能体编排</div>
+        <div class="nav-item">工作流编排</div>
+        <div class="nav-item">技能与插件管理</div>
+        <div class="nav-item">记忆管理</div>
+      </div>
+      <div class="side-box">
+        <div class="side-box-title">事件驱动引擎</div>
+        <div class="nav-item">经营周期驱动</div>
+        <div class="nav-item">目标下发驱动</div>
+        <div class="nav-item">数据更新驱动</div>
+      </div>
+    </div>
+
+    <div class="main">
+
+      <!-- ===== 交互层 ===== -->
+      <div class="layer-interact">
+        <div class="layer-label">交互层</div>
+        <div class="interact-bar">平安DO · 营销规划智能体（统一对话入口）</div>
+      </div>
+
+      <div class="arrow"><svg width="12" height="20" viewBox="0 0 12 20"><line x1="6" y1="0" x2="6" y2="12" stroke="#7B6CF0" stroke-width="2" stroke-dasharray="4,3"/><path d="M6 20 L1 12 L11 12 Z" fill="#7B6CF0"/></svg></div>
+
+      <!-- ===== Agent 应用层 ===== -->
+      <div class="layer-agent">
+        <div class="layer-label">Agent 应用层<span class="tech-tag tag-purple">= OpenClaw 实例</span></div>
+
+        <div class="agent-four-col">
+          <div class="func-title-box bg-red">目标计划拆解</div>
+          <div class="func-title-box bg-purple">规划达成路径</div>
+          <div class="func-title-box bg-blue">推荐场景活动</div>
+        </div>
+
+        <div class="skills-label">场景化 SKILLS（二级功能）</div>
+
+        <div class="skill-unified-grid">
+
+          <!-- ====== Column 1: 目标计划拆解 ====== -->
+          <div class="skill-col-stretch">
+            <!-- 拆解月度目标 P1 -->
+            <div class="skill-card">
+              <div class="skill-card-head">
+                <span class="skill-tag st-red">拆解月度目标</span>
+                <span class="skill-prio p1">P1</span>
+              </div>
+              <div class="skill-item"><div class="skill-item-name">获取上级目标</div><div class="skill-item-desc">拉取上级下发的目标数据</div></div>
+              <div class="skill-item"><div class="skill-item-name">获取问责目标</div><div class="skill-item-desc">获取考核问责指标与基线</div></div>
+              <div class="skill-item"><div class="skill-item-name">拆解月度目标</div><div class="skill-item-desc">将业务季目标拆解至月度</div></div>
+              <div class="skill-item"><div class="skill-item-name">拆分结果合理性校验</div><div class="skill-item-desc">校验波动范围与约束规则</div></div>
+            </div>
+            <!-- 拆解下级目标 P1 -->
+            <div class="skill-card">
+              <div class="skill-card-head">
+                <span class="skill-tag st-red">拆解下级目标</span>
+                <span class="skill-prio p1">P1</span>
+              </div>
+              <div class="skill-item"><div class="skill-item-name">拆解目标至下级</div><div class="skill-item-desc">多维权重拆解至下辖各营业单位</div></div>
+              <div class="skill-item"><div class="skill-item-name">目标数据同步下发</div><div class="skill-item-desc">推送机构系统并DO留痕</div></div>
+            </div>
+          </div>
+
+          <!-- ====== Column 2: 规划达成路径 ====== -->
+          <div class="skill-col-stretch">
+            <!-- 产品达成路径 P0 -->
+            <div class="skill-card">
+              <div class="skill-card-head">
+                <span class="skill-tag st-purple">产品达成路径</span>
+                <span class="skill-prio p0">P0</span>
+              </div>
+              <div class="skill-item"><div class="skill-item-name">产品画像分析</div><div class="skill-item-desc">分析主推产品特征与适配客群</div></div>
+              <div class="skill-item"><div class="skill-item-name">产品达成规划</div><div class="skill-item-desc">制定产品维度的达成路径方案</div></div>
+              <div class="skill-item"><div class="skill-item-name">产品达成测算</div><div class="skill-item-desc">测算各产品达成目标所需件数</div></div>
+            </div>
+            <!-- 客户达成路径 P0 -->
+            <div class="skill-card">
+              <div class="skill-card-head">
+                <span class="skill-tag st-purple">客户达成路径</span>
+                <span class="skill-prio p0">P0</span>
+              </div>
+              <div class="skill-item"><div class="skill-item-name">客户画像分析</div><div class="skill-item-desc">分析客户分布、客温与客价</div></div>
+              <div class="skill-item"><div class="skill-item-name">客户达成规划</div><div class="skill-item-desc">制定客户维度的达成路径方案</div></div>
+              <div class="skill-item"><div class="skill-item-name">客户达成测算</div><div class="skill-item-desc">测算目标达成所需客户开单数</div></div>
+            </div>
+            <!-- 队伍达成路径 P0 -->
+            <div class="skill-card">
+              <div class="skill-card-head">
+                <span class="skill-tag st-purple">队伍达成路径</span>
+                <span class="skill-prio p0">P0</span>
+              </div>
+              <div class="skill-item"><div class="skill-item-name">队伍画像分析</div><div class="skill-item-desc">分析层级结构与产能分布</div></div>
+              <div class="skill-item"><div class="skill-item-name">队伍达成规划</div><div class="skill-item-desc">制定队伍维度的达成路径方案</div></div>
+              <div class="skill-item"><div class="skill-item-name">队伍达成测算</div><div class="skill-item-desc">测算目标达成所需人力与产能</div></div>
+            </div>
+          </div>
+
+          <!-- ====== Column 3: 推荐场景活动 ====== -->
+          <div class="skill-col-stretch">
+            <!-- 推荐活动频次 P1 -->
+            <div class="skill-card">
+              <div class="skill-card-head">
+                <span class="skill-tag st-blue">推荐活动频次</span>
+                <span class="skill-prio p1">P1</span>
+              </div>
+              <div class="skill-item"><div class="skill-item-name">经营条件结构化</div><div class="skill-item-desc">用户选择项转为标准查询条件</div></div>
+              <div class="skill-item"><div class="skill-item-name">活动库全量检索</div><div class="skill-item-desc">检索活动数据及标签、历史效果</div></div>
+              <div class="skill-item"><div class="skill-item-name">标签匹配打分</div><div class="skill-item-desc">四维权重计算活动匹配度</div></div>
+              <div class="skill-item"><div class="skill-item-name">活动频次推荐</div><div class="skill-item-desc">排序输出最优推荐活动列表</div></div>
+            </div>
+            <!-- 活动策划方案 P2 -->
+            <div class="skill-card">
+              <div class="skill-card-head">
+                <span class="skill-tag st-blue">活动策划方案</span>
+                <span class="skill-prio p2">P2</span>
+              </div>
+              <div class="skill-item"><div class="skill-item-name">方案模板匹配</div><div class="skill-item-desc">检索最佳策划模板</div></div>
+              <div class="skill-item"><div class="skill-item-name">活动策划方案生成</div><div class="skill-item-desc">生成流程、物料、话术、预算</div></div>
+              <div class="skill-item"><div class="skill-item-name">活动效果预估</div><div class="skill-item-desc">预测参与人数与转化率</div></div>
+              <div class="skill-item"><div class="skill-item-name">推荐理由自然语言生成</div><div class="skill-item-desc">LLM生成易读推荐理由</div></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="priority-row">
+          <span><span class="prio-dot pd0"></span>P0 最高优先级</span>
+          <span><span class="prio-dot pd1"></span>P1 高优先级</span>
+          <span><span class="prio-dot pd2"></span>P2 中优先级</span>
+        </div>
+      </div>
+
+      <div class="arrow"><svg width="12" height="20" viewBox="0 0 12 20"><line x1="6" y1="0" x2="6" y2="12" stroke="#00B894" stroke-width="2" stroke-dasharray="4,3"/><path d="M6 20 L1 12 L11 12 Z" fill="#00B894"/></svg></div>
+
+      <!-- ===== 原子化工具层 ===== -->
+      <div class="layer-tools">
+        <div class="layer-label">原子化工具层<span class="tech-tag tag-green">= MCP 工具</span></div>
+        <div class="tools-row">
+          <div class="tools-col">
+            <div class="tools-col-title">目标计划拆解工具</div>
+            <div class="chips-split">
+              <div class="chips-left">
+                <span class="chip">获取上级目标</span>
+                <span class="chip">获取问责目标</span>
+                <span class="chip">拆解月度目标</span>
+                <span class="chip">拆解下级目标</span>
+              </div>
+              <div class="chips-right">
+                <span class="chip">拆分校验</span>
+                <span class="chip">目标下发</span>
+              </div>
+            </div>
+          </div>
+          <div class="tools-col">
+            <div class="tools-col-title">规划达成路径工具</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:0;">
+              <span class="chip" style="text-align:center;">产品画像分析</span>
+              <span class="chip" style="text-align:center;">产品达成规划</span>
+              <span class="chip" style="text-align:center;">产品达成测算</span>
+              <span class="chip" style="text-align:center;">客户画像分析</span>
+              <span class="chip" style="text-align:center;">客户达成规划</span>
+              <span class="chip" style="text-align:center;">客户达成测算</span>
+              <span class="chip" style="text-align:center;">队伍画像分析</span>
+              <span class="chip" style="text-align:center;">队伍达成规划</span>
+              <span class="chip" style="text-align:center;">队伍达成测算</span>
+            </div>
+          </div>
+          <div class="tools-col">
+            <div class="tools-col-title">推荐场景活动工具</div>
+            <div class="chips-split">
+              <div class="chips-left">
+                <span class="chip">条件结构化</span>
+                <span class="chip">活动库检索</span>
+                <span class="chip">标签匹配打分</span>
+                <span class="chip">频次推荐</span>
+              </div>
+              <div class="chips-right">
+                <span class="chip">方案模板匹配</span>
+                <span class="chip">策划方案生成</span>
+                <span class="chip">效果预估</span>
+                <span class="chip">理由生成</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arrow"><svg width="12" height="20" viewBox="0 0 12 20"><line x1="6" y1="0" x2="6" y2="12" stroke="#E17055" stroke-width="2" stroke-dasharray="4,3"/><path d="M6 20 L1 12 L11 12 Z" fill="#E17055"/></svg></div>
+
+      <!-- ===== 数据层 ===== -->
+      <div class="layer-data">
+        <div class="layer-label">数据层</div>
+        <div class="data-grid">
+          <div class="data-card">
+            <div class="data-icon di1">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3zM3 9h18M9 21V9"/></svg>
+            </div>
+            <div class="data-name">经营指标库</div>
+            <div class="data-desc">业绩指标、产能指标<br>客开指标、人力指标<br>季度/月度目标</div>
+          </div>
+          <div class="data-card">
+            <div class="data-icon di5">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+            </div>
+            <div class="data-name">客户资源库</div>
+            <div class="data-desc">客户档案、客温<br>客价、客群标签</div>
+          </div>
+          <div class="data-card">
+            <div class="data-icon di2">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div class="data-name">代理人信息库</div>
+            <div class="data-desc">代理人档案、历史业绩<br>画像标签</div>
+          </div>
+          <div class="data-card">
+            <div class="data-icon di3">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a4 4 0 00-8 0v2"/></svg>
+            </div>
+            <div class="data-name">产品知识库</div>
+            <div class="data-desc">主推产品、费率规则<br>产品特征、适配客群</div>
+          </div>
+          <div class="data-card">
+            <div class="data-icon di4">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+            </div>
+            <div class="data-name">活动方案库</div>
+            <div class="data-desc">场景活动、策划模板<br>历史效果、标签体系</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer">营销规划智能体功能架构图 V1.0 · 平安人寿内勤系统平安DO · 2026年4月</div>
+</div>
+</body>
+</html>

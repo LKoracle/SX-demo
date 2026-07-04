@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>平安DO · 内勤智能体技术架构图</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;background:#EEECEA;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:40px 20px;}
+.page{width:1440px;background:#fff;border-radius:12px;box-shadow:0 4px 28px rgba(0,0,0,.10);padding:40px 44px 32px;}
+.main-title{text-align:center;font-size:24px;font-weight:700;color:#222;letter-spacing:3px;}
+.sub-title{text-align:center;font-size:11px;color:#aaa;margin-top:6px;margin-bottom:28px;letter-spacing:.5px;}
+
+.wrap{display:flex;gap:16px;}
+
+/* ── 左侧栏 ── */
+.side{width:155px;flex-shrink:0;display:flex;flex-direction:column;gap:14px;}
+.side-box{border:1px solid #E0DFD9;border-radius:8px;padding:14px 12px;}
+.side-box-title{font-size:12px;font-weight:700;padding-bottom:6px;border-bottom:2px solid #EDEDEA;margin-bottom:8px;}
+.side-box-title.blue{color:#1565C0;}
+.side-box-title.slate{color:#5C6BC0;}
+.side-box .nav-item{font-size:10.5px;color:#888;line-height:2.1;border-bottom:1px solid #F0EFEC;padding-bottom:1px;white-space:nowrap;}
+.side-box .nav-item:last-child{border-bottom:none;}
+.side-box .nav-item .dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:middle;}
+.dot-blue{background:#1565C0;}
+.dot-purple{background:#7B6CF0;}
+
+/* ── 主内容 ── */
+.main{flex:1;min-width:0;}
+.arrow{text-align:center;margin:6px 0;}
+.layer-label{font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.tech-tag{display:inline-block;font-size:10px;font-weight:600;padding:3px 12px;border-radius:20px;border:1px solid;margin-left:auto;}
+.tech-tag.tag-blue{color:#1565C0;border-color:#90CAF9;background:#E3F2FD;}
+.tech-tag.tag-purple{color:#7B6CF0;border-color:#D5D0F0;background:#EBE7FB;}
+.tech-tag.tag-green{color:#00B894;border-color:#D4EDDF;background:#E3F7EF;}
+
+/* ── Layer 1: 交互层 ── */
+.layer-interact{border:1px solid #7986CB;border-radius:10px;padding:16px 20px 18px;background:transparent;box-shadow:0 -4px 12px rgba(92,107,192,.15);}
+.layer-interact .layer-label{color:#5C6BC0;}
+.interact-two{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.interact-bar{color:#fff;text-align:center;padding:14px 20px;border-radius:8px;font-size:13.5px;font-weight:500;letter-spacing:1px;box-shadow:0 2px 8px rgba(92,107,192,.22);}
+.interact-bar.pc{background:linear-gradient(135deg,#5C6BC0 0%,#7986CB 40%,#9FA8DA 100%);}
+.interact-bar.app{background:linear-gradient(135deg,#7E57C2 0%,#9575CD 40%,#B39DDB 100%);}
+.interact-sub{font-size:9.5px;opacity:.75;margin-top:4px;font-weight:400;letter-spacing:.3px;}
+
+/* ── Layer 2: DeerFlow 引擎层 ── */
+.layer-engine{border:1px solid #90CAF9;border-radius:10px;padding:16px 20px 18px;background:#EEF6FF;box-shadow:0 -4px 12px rgba(21,101,192,.13);}
+.layer-engine .layer-label{color:#1565C0;}
+.engine-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:4px;}
+.engine-card{border:1px solid #BBDEFB;border-radius:8px;padding:12px 10px 10px;background:#fff;text-align:center;}
+.engine-icon{font-size:22px;margin-bottom:5px;line-height:1;}
+.engine-name{font-size:11.5px;font-weight:700;color:#1565C0;margin-bottom:4px;}
+.engine-desc{font-size:9.5px;color:#999;line-height:1.5;}
+.engine-map{font-size:8.5px;color:#1565C0;background:#E3F2FD;border-radius:3px;padding:2px 6px;margin-top:5px;display:inline-block;}
+
+/* ── Layer 3: Skill 应用层 ── */
+.layer-skill{border:1px solid #E2DFF5;border-radius:10px;padding:16px 20px 18px;background:#FAF8FF;box-shadow:0 -4px 12px rgba(123,108,240,.12);}
+.layer-skill .layer-label{color:#7B6CF0;}
+.skill-two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px;}
+.skill-agent-box{border:1px solid #E2DFF5;border-radius:8px;padding:12px 14px;background:#fff;}
+.skill-agent-title{font-size:12px;font-weight:700;color:#fff;padding:8px 14px;border-radius:6px;margin-bottom:10px;text-align:center;display:flex;align-items:center;justify-content:center;gap:10px;}
+.sat-purple{background:linear-gradient(135deg,#6C5CE7,#7B6CF0);}
+.sat-pink{background:linear-gradient(135deg,#A855F7,#C084FB);}
+.platform-tag{font-size:9px;padding:2px 7px;border-radius:10px;background:rgba(255,255,255,.25);font-weight:400;letter-spacing:.3px;}
+.func-row{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.func-chip{font-size:10px;font-weight:700;color:#fff;border-radius:5px;padding:5px 10px;text-align:center;white-space:nowrap;}
+.fc-red{background:#E74C3C;}
+.fc-purple{background:#7B6CF0;}
+.fc-blue{background:#0984E3;}
+.fc-teal{background:#00B894;}
+.fc-amber{background:#F0932B;}
+.fc-rose{background:#E84393;}
+.skill-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:2px;}
+.skill-grid.three{grid-template-columns:1fr 1fr 1fr;}
+.sk-card{border:1px solid #EDEDEA;border-radius:6px;padding:7px 9px;background:#FAFAFA;}
+.sk-head{display:flex;align-items:center;gap:5px;margin-bottom:4px;}
+.sk-tag{font-size:8.5px;padding:2px 6px;border-radius:3px;color:#fff;font-weight:700;white-space:nowrap;}
+.st-red{background:#FF6B6B;}
+.st-purple{background:#A084F2;}
+.st-blue{background:#0984E3;}
+.st-teal{background:#00B894;}
+.st-amber{background:#F0932B;}
+.st-green{background:#27AE60;}
+.st-rose{background:#E84393;}
+.sk-prio{margin-left:auto;font-size:9.5px;font-weight:700;}
+.sk-prio.p0{color:#FF6B6B;}
+.sk-prio.p1{color:#F0932B;}
+.sk-prio.p2{color:#0984E3;}
+.sk-items{display:flex;flex-direction:column;gap:2px;}
+.sk-item{font-size:10px;font-weight:600;color:#555;}
+.sk-desc{font-size:9px;color:#bbb;line-height:1.4;}
+.sub-agent-note{font-size:9.5px;color:#7B6CF0;background:#EBE7FB;border-radius:5px;padding:5px 10px;margin-top:8px;text-align:center;}
+.priority-row{display:flex;justify-content:flex-end;gap:18px;margin-top:10px;font-size:11px;color:#aaa;}
+.sub-agent-spawn{font-size:9.5px;font-weight:500;background:#EBE7FB;color:#7B6CF0;border-radius:5px;padding:5px 10px;margin:0 0 8px;text-align:center;}
+.sa-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.sa-grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.sa-col{border:1.5px solid #C5B8F5;border-radius:8px;padding:9px 10px;background:#F4F0FE;}
+.sa-col.pink{border-color:#DDA8F5;background:#FBF5FF;}
+.sa-badge{display:inline-block;font-size:8.5px;font-weight:700;padding:2px 7px;border-radius:3px;margin-bottom:5px;}
+.sa-badge.purple{color:#7B6CF0;background:#DDD5FC;}
+.sa-badge.pink{color:#A855F7;background:#EDD8FC;}
+.sa-name{font-size:11.5px;font-weight:700;color:#5C3EBE;margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid #D5CCFA;}
+.sa-name.pink{color:#8B2FC9;border-bottom-color:#E2C4F5;}
+.sa-sk{border:1px solid #E2DFF5;border-radius:5px;padding:6px 8px;background:#fff;margin-bottom:5px;}
+.sa-sk:last-child{margin-bottom:0;}
+.sa-sk-head{display:flex;align-items:center;gap:4px;margin-bottom:3px;}
+.sa-sk-tag{font-size:8.5px;padding:2px 5px;border-radius:3px;color:#fff;font-weight:700;}
+.sa-sk-prio{margin-left:auto;font-size:9px;font-weight:700;}
+.sa-sk-prio.p0{color:#FF6B6B;}
+.sa-sk-prio.p1{color:#F0932B;}
+.sa-sk-prio.p2{color:#0984E3;}
+.sa-sk-items{font-size:9.5px;color:#777;line-height:1.7;white-space:nowrap;}
+.skill-five-grid{display:grid;grid-template-columns:repeat(9,1fr);gap:10px;margin-top:4px;}
+.skv2{border:1px solid #E2DFF5;border-radius:8px;padding:10px 12px;background:#fff;display:flex;flex-direction:column;}
+.skv2-top{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+.skv2-badge{font-size:8.5px;font-weight:700;padding:2px 7px;border-radius:3px;color:#fff;}
+.badge-red{background:#E74C3C;}.badge-purple{background:#7B6CF0;}.badge-blue{background:#0984E3;}.badge-rose{background:#A855F7;}.badge-teal{background:#00B894;}.badge-orange{background:#FF7043;}.badge-indigo{background:#5C6BC0;}.badge-cyan{background:#00ACC1;}.badge-amber{background:#F59E0B;}
+.skv2-prio{font-size:9px;font-weight:700;margin-left:auto;}
+.skv2-name{font-size:12.5px;font-weight:700;color:#333;margin-bottom:2px;}
+.skv2-platform{display:none;}
+.skv2-items{display:flex;flex-direction:column;gap:3px;}
+.skv2-item{font-size:10px;color:#555;padding:3px 7px;background:#F7F7F7;border-radius:4px;white-space:nowrap;}
+.skv2-sa-note{font-size:8.5px;color:#7B6CF0;background:#EBE7FB;border-radius:4px;padding:3px 6px;margin-bottom:5px;text-align:center;}
+.skv2-sa-mini{display:flex;flex-direction:column;gap:3px;}
+.skv2-sa-card{font-size:10px;font-weight:600;color:#5C3EBE;background:#F4F0FE;border:1px solid #D5CCFA;border-radius:4px;padding:3px 7px;white-space:nowrap;}
+.prio-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle;}
+.pd0{background:#FF6B6B;}
+.pd1{background:#F0932B;}
+.pd2{background:#0984E3;}
+
+/* ── Layer 4: 原子化工具层 ── */
+.layer-tools{border:1px solid #D4EDDF;border-radius:10px;padding:16px 20px 18px;background:#F5FCF8;box-shadow:0 -4px 12px rgba(0,184,148,.12);}
+.layer-tools .layer-label{color:#00B894;}
+.tools-two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px;}
+.tools-col{border:1px solid #D4EDDF;border-radius:8px;padding:12px 14px;background:#fff;}
+.tools-col-title{font-size:11px;font-weight:700;color:#00B894;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #E0F0E8;}
+.chips{display:flex;flex-direction:column;gap:3px;}
+.chip{font-size:9.5px;padding:3px 8px;border-radius:5px;border:1px solid #D4EDDF;background:#F5FCF8;color:#555;white-space:nowrap;}
+.tools-five-grid{display:grid;grid-template-columns:repeat(9,1fr);gap:10px;margin-top:8px;}
+.tools-shared-wrap{margin-top:10px;padding:10px 14px;background:#FFFDE7;border:1px dashed #F9A825;border-radius:8px;}
+.tools-shared-title{font-size:10px;font-weight:700;color:#E65100;margin-bottom:7px;}
+.tools-shared-list{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;}
+.tools-shared-item{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #FFE082;border-radius:6px;padding:5px 10px;}
+.chip-shared{font-size:9.5px;padding:2px 8px;border-radius:4px;background:#FFF8E1;border:1px solid #F9A825;color:#E65100;white-space:nowrap;font-weight:600;}
+.si-group{display:flex;align-items:center;gap:4px;margin-left:4px;}
+.si-dot{display:inline-block;width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.si-label{font-size:8.5px;color:#999;white-space:nowrap;}
+.tools-step-group{margin-bottom:7px;}
+.tools-step-group:last-child{margin-bottom:0;}
+.tools-step-label{font-size:9px;font-weight:700;color:#777;background:#F0F0EE;border-radius:3px;padding:2px 6px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* ── Layer 5: 数据层 ── */
+.layer-data{border:1px solid #F0E4C8;border-radius:10px;padding:16px 20px 18px;background:#FFFDF7;box-shadow:0 -4px 12px rgba(225,112,85,.12);}
+.layer-data .layer-label{color:#E17055;}
+.data-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-top:10px;}
+.data-card{text-align:center;padding:14px 8px 10px;border-radius:10px;border:1px solid #EDEDEA;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+.data-icon{width:36px;height:36px;border-radius:50%;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.di1{background:#DBEAFE;color:#2563EB;}
+.di2{background:#FEF3C7;color:#D97706;}
+.di3{background:#D1FAE5;color:#059669;}
+.di4{background:#EDE9FE;color:#7C3AED;}
+.di5{background:#FCE7F3;color:#DB2777;}
+.di6{background:#FEE2E2;color:#DC2626;}
+.di7{background:#E0F2FE;color:#0284C7;}
+.data-name{font-size:11px;font-weight:700;color:#333;}
+.data-desc{font-size:8.5px;color:#bbb;margin-top:2px;line-height:1.5;}
+.data-badge{display:inline-block;font-size:8px;padding:1px 6px;border-radius:3px;margin-top:4px;color:#fff;font-weight:600;}
+.db-both{background:#95A5A6;}
+.db-mkt{background:#7B6CF0;}
+.db-trk{background:#C084FB;}
+
+.footer{text-align:center;margin-top:20px;font-size:9px;color:#ccc;}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="main-title">平安DO · 内勤智能体技术架构图</div>
+  <div class="sub-title">技术栈：DeerFlow 2.0 &nbsp;|&nbsp; 面向内勤营销管理人员</div>
+
+  <div class="wrap">
+
+    <!-- ── 左侧栏 ── -->
+    <div class="side">
+      <div class="side-box">
+        <div class="side-box-title blue">DeerFlow 核心能力</div>
+        <div class="nav-item"><span class="dot dot-blue"></span>Lead Agent 主调度</div>
+        <div class="nav-item"><span class="dot dot-blue"></span>Plan Mode 任务规划</div>
+        <div class="nav-item"><span class="dot dot-blue"></span>Memory 长记忆</div>
+        <div class="nav-item"><span class="dot dot-blue"></span>Sub-Agents 并行执行</div>
+        <div class="nav-item"><span class="dot dot-blue"></span>Skill 插件管理</div>
+        <div class="nav-item"><span class="dot dot-blue"></span>MCP 协议支持</div>
+        <div class="nav-item"><span class="dot dot-blue"></span>REST API 流式推送</div>
+      </div>
+      <div class="side-box">
+        <div class="side-box-title slate">事件驱动引擎</div>
+        <div class="nav-item">经营周期驱动</div>
+        <div class="nav-item">目标下发驱动</div>
+        <div class="nav-item">数据更新驱动</div>
+        <div class="nav-item">指标异动驱动</div>
+        <div class="nav-item">流程节点驱动</div>
+        <div class="nav-item">数据状态驱动</div>
+      </div>
+    </div>
+
+    <div class="main">
+
+      <!-- ══════════════ Layer 1: 交互层 ══════════════ -->
+      <div class="layer-interact">
+        <div class="layer-label">交互层</div>
+        <div class="interact-two">
+          <div class="interact-bar pc">
+            平安DO · AskBob（PC Web）
+          </div>
+          <div class="interact-bar app">
+            平安DO · AskBob（APP）
+          </div>
+        </div>
+      </div>
+
+      <div class="arrow">
+        <svg width="12" height="20" viewBox="0 0 12 20"><line x1="6" y1="0" x2="6" y2="12" stroke="#1565C0" stroke-width="2" stroke-dasharray="4,3"/><path d="M6 20 L1 12 L11 12 Z" fill="#1565C0"/></svg>
+      </div>
+
+      <!-- ══════════════ Layer 2: DeerFlow 引擎层 ══════════════ -->
+      <div class="layer-engine">
+        <div class="layer-label">
+          DeerFlow 引擎层
+        </div>
+        <div class="engine-grid">
+
+          <div class="engine-card">
+            <div class="engine-icon">🧠</div>
+            <div class="engine-name">Lead Agent 主调度</div>
+            <div class="engine-desc">识别用户意图<br>路由至 9 个 Skill</div>
+            <div class="engine-map">目标拆解·达成路径·推荐活动·面谈辅助·业绩追踪·指标查询·贺报·PPT·视频</div>
+          </div>
+
+          <div class="engine-card">
+            <div class="engine-icon">🗂️</div>
+            <div class="engine-name">Skill 编排执行</div>
+            <div class="engine-desc">Skill 调用与顺序<br>步骤流程管理</div>
+            <div class="engine-map">拆解月度目标→拆解下级目标 / 面谈准备→执行→档案</div>
+          </div>
+
+          <div class="engine-card">
+            <div class="engine-icon">⚡</div>
+            <div class="engine-name">Sub-Agents 并行执行</div>
+            <div class="engine-desc">派生子智能体<br>多路径同时执行</div>
+            <div class="engine-map">产品 · 客户 · 队伍达成路径</div>
+          </div>
+
+          <div class="engine-card">
+            <div class="engine-icon">💾</div>
+            <div class="engine-name">Memory 长记忆</div>
+            <div class="engine-desc">跨会话持久化<br>上下文沉淀复用</div>
+            <div class="engine-map">面谈档案 · 代理人画像</div>
+          </div>
+
+          <div class="engine-card">
+            <div class="engine-icon">🔌</div>
+            <div class="engine-name">REST API · SSE</div>
+            <div class="engine-desc">LangGraph 兼容<br>流式推送响应</div>
+            <div class="engine-map">平安DO PC / APP 双端接入</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="arrow">
+        <svg width="12" height="20" viewBox="0 0 12 20"><line x1="6" y1="0" x2="6" y2="12" stroke="#7B6CF0" stroke-width="2" stroke-dasharray="4,3"/><path d="M6 20 L1 12 L11 12 Z" fill="#7B6CF0"/></svg>
+      </div>
+
+      <!-- ══════════════ Layer 3: Skill 应用层 ══════════════ -->
+      <div class="layer-skill">
+        <div class="layer-label">
+          Skill 应用层
+        </div>
+
+        <div class="skill-five-grid">
+
+          <!-- Skill 1: 目标计划拆解 -->
+          <div class="skv2" style="border-top:3px solid #E74C3C;">
+            <div class="skv2-top">
+              <span class="skv2-badge badge-red">Skill</span>
+              <span class="skv2-prio p1">P1</span>
+            </div>
+            <div class="skv2-name">目标计划拆解</div>
+            <div class="skv2-platform">PC Web</div>
+            <div class="skv2-items">
+              <div class="skv2-item">拆解月度目标</div>
+              <div class="skv2-item">拆解下级目标</div>
+            </div>
+          </div>
+
+          <!-- Skill 2: 规划达成路径（含 Sub-Agents） -->
+          <div class="skv2" style="border-top:3px solid #7B6CF0;">
+            <div class="skv2-top">
+              <span class="skv2-badge badge-purple">Skill</span>
+              <span class="skv2-prio p0">P0</span>
+            </div>
+            <div class="skv2-name">规划达成路径</div>
+            <div class="skv2-platform">PC Web</div>
+            <div class="skv2-sa-note">⚡ 派生 3 个 Sub-Agents 并行</div>
+            <div class="skv2-sa-mini">
+              <div class="skv2-sa-card">产品达成路径</div>
+              <div class="skv2-sa-card">客户达成路径</div>
+              <div class="skv2-sa-card">队伍达成路径</div>
+            </div>
+          </div>
+
+          <!-- Skill 3: 推荐场景活动 -->
+          <div class="skv2" style="border-top:3px solid #0984E3;">
+            <div class="skv2-top">
+              <span class="skv2-badge badge-blue">Skill</span>
+              <span class="skv2-prio p2">P2</span>
+            </div>
+            <div class="skv2-name">推荐场景活动</div>
+            <div class="skv2-platform">PC Web</div>
+            <div class="skv2-items">
+              <div class="skv2-item">推荐活动频次</div>
+              <div class="skv2-item">推荐活动方案</div>
+            </div>
+          </div>
+
+          <!-- Skill 4: 面谈辅助 -->
+          <div class="skv2" style="border-top:3px solid #A855F7;">
+            <div class="skv2-top">
+              <span class="skv2-badge badge-rose">Skill</span>
+              <span class="skv2-prio p0">P0</span>
+            </div>
+            <div class="skv2-name">面谈辅助</div>
+            <div class="skv2-platform">APP</div>
+            <div class="skv2-items">
+              <div class="skv2-item">面谈准备</div>
+              <div class="skv2-item">面谈执行</div>
+              <div class="skv2-item">面谈档案</div>
+            </div>
+          </div>
+
+          <!-- Skill 5: 业绩追踪 -->
+          <div class="skv2" style="border-top:3px solid #00B894;">
+            <div class="skv2-top">
+              <span class="skv2-badge badge-teal">Skill</span>
+              <span class="skv2-prio p1">P1</span>
+            </div>
+            <div class="skv2-name">业绩追踪</div>
+            <div class="skv2-platform">APP</div>
+            <div class="skv2-items">
+              <div class="skv2-item">过程追踪</div>
+              <div class="skv2-item">预警诊断</div>
+              <div class="skv2-item">策略干预</div>
+            </div>
+          </div>
+
+          <!-- Skill 6: 贺报制作 -->
+          <div class="skv2" style="border-top:3px solid #FF7043;">
+            <div class="skv2-top">
+              <span class="skv2-badge badge-orange">Skill</span>
+              <span class="skv2-prio p0">P0</span>
+            </div>
+            <div class="skv2-name">贺报制作</div>
+            <div class="skv2-items">
+              <div class="skv2-item">达钻贺报制作</div>
+              <div class="skv2-item">出单贺报制作</div>
+              <div class="skv2-item">大单贺报制作</div>
+              <div class="skv2-item">榜单贺报制作</div>
+              <div class="skv2-item">节日贺报制作</div>
+              <div class="skv2-item">案例贺报制作</div>
+            </div>
+          </div>
+
+          <!-- Skill 7: PPT制作 -->
+          <div class="skv2" style="border-top:3px solid #5C6BC0;">
+            <div class="skv2-top">
+              <span class="skv2-badge badge-indigo">Skill</span>
+            </div>
+            <div class="skv2-name">PPT制作</div>
+            <div class="skv2-items">
+              <div class="skv2-item" style="color:#bbb;font-style:italic;">需求待规划</div>
+            </div>
+          </div>
+
+          <!-- Skill 8: 视频制作 -->
+          <div class="skv2" style="border-top:3px solid #F59E0B;">
+            <div class="skv2-top">
+              <span class="skv2-badge badge-amber">Skill</span>
+            </div>
+            <div class="skv2-name">视频制作</div>
+            <div class="skv2-items">
+              <div class="skv2-item" style="color:#bbb;font-style:italic;">需求待规划</div>
+            </div>
+          </div>
+
+          <!-- Skill 9: 指标查询 -->
+          <div class="skv2" style="border-top:3px solid #00ACC1;">
+            <div class="skv2-top">
+              <span class="skv2-badge badge-cyan">Skill</span>
+              <span class="skv2-prio p1">P1</span>
+            </div>
+            <div class="skv2-name">指标查询</div>
+            <div class="skv2-items">
+              <div class="skv2-item">指标达成</div>
+              <div class="skv2-item">指标排名</div>
+              <div class="skv2-item">指标占比</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="priority-row">
+          <span><span class="prio-dot pd0"></span>P0 最高优先级</span>
+          <span><span class="prio-dot pd1"></span>P1 高优先级</span>
+          <span><span class="prio-dot pd2"></span>P2 中优先级</span>
+        </div>
+      </div>
+
+      <div class="arrow">
+        <svg width="12" height="20" viewBox="0 0 12 20"><line x1="6" y1="0" x2="6" y2="12" stroke="#00B894" stroke-width="2" stroke-dasharray="4,3"/><path d="M6 20 L1 12 L11 12 Z" fill="#00B894"/></svg>
+      </div>
+
+      <!-- ══════════════ Layer 4: 原子化工具层 ══════════════ -->
+      <div class="layer-tools">
+        <div class="layer-label">
+          原子化工具层
+        </div>
+        <div class="tools-five-grid">
+
+          <!-- 目标计划拆解 -->
+          <div class="tools-col" style="border-top:3px solid #E74C3C;">
+            <div class="tools-col-title" style="color:#E74C3C;">目标计划拆解</div>
+            <div class="tools-step-group">
+              <div class="tools-step-label">拆解月度目标</div>
+              <div class="chips">
+                <span class="chip">获取推动目标</span>
+                <span class="chip">获取问责目标</span>
+                <span class="chip">拆解月度推动目标</span>
+              </div>
+            </div>
+            <div class="tools-step-group">
+              <div class="tools-step-label">拆解下级目标</div>
+              <div class="chips">
+                <span class="chip">拆解下级推动目标</span>
+                <span class="chip">目标下发</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 规划达成路径 -->
+          <div class="tools-col" style="border-top:3px solid #7B6CF0;">
+            <div class="tools-col-title" style="color:#7B6CF0;">规划达成路径</div>
+            <div class="tools-step-group">
+              <div class="tools-step-label">产品达成路径</div>
+              <div class="chips">
+                <span class="chip">产品画像分析</span>
+                <span class="chip">产品达成规划</span>
+                <span class="chip">产品达成测算</span>
+              </div>
+            </div>
+            <div class="tools-step-group">
+              <div class="tools-step-label">客户达成路径</div>
+              <div class="chips">
+                <span class="chip">客户画像分析</span>
+                <span class="chip">客户达成规划</span>
+                <span class="chip">客户达成测算</span>
+              </div>
+            </div>
+            <div class="tools-step-group">
+              <div class="tools-step-label">队伍达成路径</div>
+              <div class="chips">
+                <span class="chip">队伍画像分析</span>
+                <span class="chip">队伍达成规划</span>
+                <span class="chip">队伍达成测算</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 推荐场景活动 -->
+          <div class="tools-col" style="border-top:3px solid #0984E3;">
+            <div class="tools-col-title" style="color:#0984E3;">推荐场景活动</div>
+            <div class="tools-step-group">
+              <div class="tools-step-label">推荐活动频次</div>
+              <div class="chips">
+                <span class="chip">活动库检索</span>
+                <span class="chip">层级频次推荐</span>
+              </div>
+            </div>
+            <div class="tools-step-group">
+              <div class="tools-step-label">推荐活动方案</div>
+              <div class="chips">
+                <span class="chip">方案模板匹配</span>
+                <span class="chip">策划方案生成</span>
+                <span class="chip">转化效果预估</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 面谈辅助 -->
+          <div class="tools-col" style="border-top:3px solid #A855F7;">
+            <div class="tools-col-title" style="color:#A855F7;">面谈辅助</div>
+            <div class="tools-step-group">
+              <div class="tools-step-label">面谈准备</div>
+              <div class="chips">
+                <span class="chip">固定主题名单</span>
+                <span class="chip">代理人画像</span>
+                <span class="chip">AI数据洞察</span>
+              </div>
+            </div>
+            <div class="tools-step-group">
+              <div class="tools-step-label">面谈执行</div>
+              <div class="chips">
+                <span class="chip">数字化面谈</span>
+                <span class="chip">目标制定</span>
+                <span class="chip">面谈总结</span>
+              </div>
+            </div>
+            <div class="tools-step-group">
+              <div class="tools-step-label">面谈档案</div>
+              <div class="chips">
+                <span class="chip">面谈档案管理</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 业绩追踪 -->
+          <div class="tools-col" style="border-top:3px solid #00B894;">
+            <div class="tools-col-title" style="color:#00B894;">业绩追踪</div>
+            <div class="tools-step-group">
+              <div class="tools-step-label">过程追踪</div>
+              <div class="chips">
+                <span class="chip">指标追踪</span>
+                <span class="chip">偏差诊断</span>
+              </div>
+            </div>
+            <div class="tools-step-group">
+              <div class="tools-step-label">预警诊断</div>
+              <div class="chips">
+                <span class="chip">自动预警</span>
+                <span class="chip">根因分析</span>
+              </div>
+            </div>
+            <div class="tools-step-group">
+              <div class="tools-step-label">策略干预</div>
+              <div class="chips">
+                <span class="chip">方案匹配</span>
+                <span class="chip">行动计划</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 贺报制作 -->
+          <div class="tools-col" style="border-top:3px solid #FF7043;">
+            <div class="tools-col-title" style="color:#FF7043;">贺报制作</div>
+            <div class="tools-step-group">
+              <div class="tools-step-label">达钻贺报制作</div>
+              <div class="chips">
+                <span class="chip">贺报模板匹配</span>
+                <span class="chip">贺报生成</span>
+              </div>
+            </div>
+            <div class="tools-step-group">
+              <div class="tools-step-label">出单贺报制作</div>
+              <div class="chips">
+                <span class="chip">贺报模板匹配</span>
+                <span class="chip">贺报生成</span>
+              </div>
+            </div>
+            <div class="tools-step-group">
+              <div class="tools-step-label">大单贺报制作</div>
+              <div class="chips">
+                <span class="chip">贺报模板匹配</span>
+                <span class="chip">贺报生成</span>
+              </div>
+            </div>
+            <div class="tools-step-group">
+              <div class="tools-step-label">榜单贺报制作</div>
+              <div class="chips">
+                <span class="chip">贺报模板匹配</span>
+                <span class="chip">贺报生成</span>
+              </div>
+            </div>
+            <div class="tools-step-group">
+              <div class="tools-step-label">节日贺报制作</div>
+              <div class="chips">
+                <span class="chip">贺报模板匹配</span>
+                <span class="chip">贺报生成</span>
+              </div>
+            </div>
+            <div class="tools-step-group">
+              <div class="tools-step-label">案例贺报制作</div>
+              <div class="chips">
+                <span class="chip">贺报模板匹配</span>
+                <span class="chip">贺报生成</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- PPT制作 -->
+          <div class="tools-col" style="border-top:3px solid #5C6BC0;">
+            <div class="tools-col-title" style="color:#5C6BC0;">PPT制作</div>
+            <div style="font-size:9.5px;color:#ccc;padding:8px 0;font-style:italic;text-align:center;">待需求规划</div>
+          </div>
+
+          <!-- 视频制作 -->
+          <div class="tools-col" style="border-top:3px solid #F59E0B;">
+            <div class="tools-col-title" style="color:#F59E0B;">视频制作</div>
+            <div style="font-size:9.5px;color:#ccc;padding:8px 0;font-style:italic;text-align:center;">待需求规划</div>
+          </div>
+
+          <!-- 指标查询 -->
+          <div class="tools-col" style="border-top:3px solid #00ACC1;">
+            <div class="tools-col-title" style="color:#00ACC1;">指标查询</div>
+            <div class="tools-step-group">
+              <div class="tools-step-label">指标达成</div>
+              <div class="chips">
+                <span class="chip">指标达成查询</span>
+              </div>
+            </div>
+            <div class="tools-step-group">
+              <div class="tools-step-label">指标排名</div>
+              <div class="chips">
+                <span class="chip">指标排名查询</span>
+              </div>
+            </div>
+            <div class="tools-step-group">
+              <div class="tools-step-label">指标占比</div>
+              <div class="chips">
+                <span class="chip">指标占比查询</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 公共工具区 -->
+        <div class="tools-shared-wrap">
+          <div class="tools-shared-title">公共工具（跨 Skill 复用）</div>
+          <div class="tools-shared-list">
+
+            <div class="tools-shared-item">
+              <span class="chip-shared">代理人搜索</span>
+              <div class="si-group">
+                <span class="si-dot" style="background:#A855F7;"></span>
+                <span class="si-label">面谈辅助</span>
+                <span class="si-dot" style="background:#FF7043;"></span>
+                <span class="si-label">贺报制作</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="arrow">
+        <svg width="12" height="20" viewBox="0 0 12 20"><line x1="6" y1="0" x2="6" y2="12" stroke="#E17055" stroke-width="2" stroke-dasharray="4,3"/><path d="M6 20 L1 12 L11 12 Z" fill="#E17055"/></svg>
+      </div>
+
+      <!-- ══════════════ Layer 5: 数据层 ══════════════ -->
+      <div class="layer-data">
+        <div class="layer-label">数据层</div>
+        <div class="data-grid">
+
+          <div class="data-card">
+            <div class="data-icon di1">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3zM3 9h18M9 21V9"/></svg>
+            </div>
+            <div class="data-name">经营指标库</div>
+            <div class="data-desc">业绩 / 产能<br>客开 / 人力</div>
+            <div class="data-badge db-both">共用</div>
+          </div>
+
+          <div class="data-card">
+            <div class="data-icon di5">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+            </div>
+            <div class="data-name">客户资源库</div>
+            <div class="data-desc">客户档案<br>客温 / 客价</div>
+            <div class="data-badge db-both">共用</div>
+          </div>
+
+          <div class="data-card">
+            <div class="data-icon di2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div class="data-name">代理人信息库</div>
+            <div class="data-desc">档案 / 业绩<br>画像标签</div>
+            <div class="data-badge db-both">共用</div>
+          </div>
+
+          <div class="data-card">
+            <div class="data-icon di3">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a4 4 0 00-8 0v2"/></svg>
+            </div>
+            <div class="data-name">产品知识库</div>
+            <div class="data-desc">主推产品<br>费率 / 适配客群</div>
+            <div class="data-badge db-mkt">营销规划</div>
+          </div>
+
+          <div class="data-card">
+            <div class="data-icon di4">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+            </div>
+            <div class="data-name">活动方案库</div>
+            <div class="data-desc">场景活动<br>模板 / 历史效果</div>
+            <div class="data-badge db-mkt">营销规划</div>
+          </div>
+
+          <div class="data-card">
+            <div class="data-icon di6">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+            </div>
+            <div class="data-name">面谈档案库</div>
+            <div class="data-desc">面谈记录<br>纪要 / 行动计划</div>
+            <div class="data-badge db-trk">追踪管理</div>
+          </div>
+
+          <div class="data-card">
+            <div class="data-icon di7">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+            </div>
+            <div class="data-name">干预方案库</div>
+            <div class="data-desc">经营改善<br>历史最佳实践</div>
+            <div class="data-badge db-trk">追踪管理</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /wrap -->
+
+  <div class="footer">平安DO · 内勤智能体技术架构图 V1.0 · DeerFlow 2.0 技术栈 · 平安人寿内勤系统 · 2026年5月</div>
+</div>
+</body>
+</html>

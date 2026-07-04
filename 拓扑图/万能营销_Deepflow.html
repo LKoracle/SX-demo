@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>万能营销 · Deepflow 系统拓扑图</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  background: #f0f2f5;
+  color: #1e293b;
+  min-height: 100vh;
+  padding: 36px 24px 60px;
+}
+
+/* ── 三栏：左岸 | 数据流 | 右岸 ── */
+.river-wrap {
+  display: grid;
+  grid-template-columns: 1fr 192px 1fr;
+  max-width: 1100px;
+  margin: 0 auto;
+  gap: 0;
+  align-items: stretch;
+}
+
+/* ── 数据流河道 ── */
+.rv {
+  background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-left: 2px solid #7dd3fc;
+  border-right: 2px solid #7dd3fc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 10px;
+  position: relative;
+}
+.rv-title {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #0284c7;
+  margin-bottom: 6px;
+  opacity: 0.6;
+}
+/* 河道中的数据条目 */
+.r-chip {
+  background: #ffffff;
+  border: 1px solid #bae6fd;
+  border-radius: 5px;
+  padding: 3px 7px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #0369a1;
+  white-space: nowrap;
+  margin: 2px 0;
+  text-align: center;
+  max-width: 174px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.r-chip.new {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+.r-chip.loop {
+  background: #f0fdf4;
+  border-color: #86efac;
+  color: #15803d;
+}
+/* 协作分支数据（紫色） */
+.r-chip.sub {
+  background: #faf5ff;
+  border-color: #c4b5fd;
+  color: #7c3aed;
+}
+/* ── 数据流方向箭头 ── */
+.arr-l { color: #2563eb; font-size: 10px; font-weight: 900; flex-shrink: 0; }
+.arr-r { color: #0284c7; font-size: 10px; font-weight: 900; flex-shrink: 0; }
+.arr-w { color: #059669; font-size: 9px; font-weight: 700; margin-right: 2px; flex-shrink: 0; opacity: 0.8; }
+.arr-ws { color: #7c3aed; font-size: 9px; font-weight: 700; margin-right: 2px; flex-shrink: 0; opacity: 0.8; }
+/* 河道里的方向标注 */
+.r-dir {
+  font-size: 9px;
+  color: #94a3b8;
+  margin: 3px 0 1px;
+  align-self: stretch;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+.r-dir.left  { text-align: left;  padding-left: 4px;  color: #2563eb; }
+.r-dir.right { text-align: right; padding-right: 4px; color: #0369a1; }
+.r-dir.both  { text-align: center; color: #7c3aed; }
+.r-dir.sub   { text-align: center; color: #7c3aed; }
+/* 河道分隔线（阶段间） */
+.r-seg {
+  width: 1px;
+  border-left: 1px dashed #bae6fd;
+  height: 18px;
+  margin: 4px auto;
+}
+.r-seg.sub {
+  border-left-color: #c4b5fd;
+}
+/* 河道进入/汇入标识 */
+.r-entry {
+  background: #dbeafe;
+  border: 1.5px solid #93c5fd;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #1d4ed8;
+  text-align: center;
+  margin-bottom: 4px;
+}
+.r-out {
+  background: #dcfce7;
+  border: 1.5px solid #86efac;
+  border-radius: 6px;
+  padding: 3px 7px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #15803d;
+  text-align: center;
+  margin: 2px 0;
+  max-width: 174px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+/* 协作分支写回（紫色底） */
+.r-out.sub {
+  background: #faf5ff;
+  border-color: #c4b5fd;
+  color: #7c3aed;
+}
+/* 写回→入流 分界标签 */
+.r-inflow {
+  font-size: 8px;
+  color: #93c5fd;
+  text-align: center;
+  margin: 1px 0;
+  letter-spacing: 0.5px;
+}
+.r-inflow.sub {
+  color: #a78bfa;
+}
+/* 协作分支标题栏 */
+.r-sub-header {
+  align-self: stretch;
+  background: #f5f3ff;
+  border: 1px dashed #c4b5fd;
+  border-radius: 5px;
+  padding: 2px 6px;
+  font-size: 8px;
+  font-weight: 700;
+  color: #7c3aed;
+  text-align: center;
+  letter-spacing: 0.5px;
+  margin: 4px 0 2px;
+}
+
+/* ── 岸边（左/右）单元格 ── */
+.lc {
+  padding: 8px 10px 8px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.rc {
+  padding: 8px 0 8px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.empty-cell { min-height: 8px; }
+
+/* ── 智能体卡片 ── */
+.ac {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 11px;
+  padding: 12px 14px 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  width: 100%;
+  max-width: 400px;
+}
+.ac-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 9px;
+}
+.ac-icon {
+  width: 30px; height: 30px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.ac-name { font-size: 12px; font-weight: 700; color: #0f172a; line-height: 1.2; }
+.ac-tag {
+  font-size: 9px; font-weight: 600; padding: 1px 6px; border-radius: 10px;
+  display: inline-block; margin-top: 2px;
+}
+.tag-do     { background: #eff6ff; color: #2563eb; }
+.tag-pocket { background: #f0f9ff; color: #0284c7; }
+.tag-collab { background: #faf5ff; color: #7c3aed; }
+
+/* IO行 */
+.ac-io { display: flex; flex-direction: column; gap: 5px; }
+.ac-row { display: flex; align-items: baseline; gap: 5px; flex-wrap: wrap; }
+.ac-lbl {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+  color: #94a3b8; flex-shrink: 0; min-width: 40px;
+}
+.io-in   { display:inline-block;font-size:10px;font-weight:500;padding:1px 6px;border-radius:4px;background:#f8fafc;color:#475569;border:1px solid #e2e8f0;margin:1px 2px 1px 0; }
+.io-tool { display:inline-block;font-size:10px;font-weight:500;padding:1px 6px;border-radius:4px;background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;margin:1px 2px 1px 0; }
+.io-tool.collab { background:#faf5ff;color:#7c3aed;border-color:#c4b5fd; }
+.io-out  { display:inline-block;font-size:10px;font-weight:500;padding:1px 6px;border-radius:4px;background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;margin:1px 2px 1px 0; }
+.io-out.sub { background:#faf5ff;color:#7c3aed;border-color:#c4b5fd; }
+
+/* Deepflow步骤 */
+.step-row {
+  display: flex; align-items: center; gap: 0;
+  margin-top: 9px; padding-top: 8px;
+  border-top: 1px solid #f1f5f9;
+  overflow-x: auto; flex-wrap: nowrap;
+}
+.sf-lbl { font-size: 8px; font-weight: 700; letter-spacing: 0.8px; color: #cbd5e1; text-transform: uppercase; white-space: nowrap; margin-right: 6px; flex-shrink: 0; }
+.sp {
+  font-size: 8.5px; font-weight: 600; padding: 2px 7px; border-radius: 8px;
+  white-space: nowrap; flex-shrink: 0;
+}
+.sp.ai   { background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; }
+.sp.usr  { background:#f8fafc; color:#475569; border:1px solid #e2e8f0; }
+.sp.auto { background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; }
+.sa { font-size:9px; color:#e2e8f0; padding:0 2px; flex-shrink:0; }
+
+/* ── 平台标签行 ── */
+.bank-header {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 6px 12px; border-radius: 7px; margin-bottom: 2px;
+}
+.bank-header.do     { color: #2563eb; background: #eff6ff; border: 1px solid #bfdbfe; }
+.bank-header.pocket { color: #0369a1; background: #f0f9ff; border: 1px solid #bae6fd; }
+
+/* ── 顶部说明 ── */
+.top-bar {
+  max-width: 1100px; margin: 0 auto 20px;
+  display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+}
+.page-title { font-size: 20px; font-weight: 700; color: #0f172a; }
+.page-sub   { font-size: 12px; color: #94a3b8; margin-top: 3px; }
+
+.legend { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.li { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #64748b; }
+.ld { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+/* ── 闭环区 ── */
+.loop-section {
+  max-width: 1100px; margin: 0 auto 24px;
+  border: 1px solid #e2e8f0; border-radius: 12px;
+  padding: 12px 18px; background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  display: flex; align-items: flex-start; gap: 14px;
+}
+.loop-chunk {
+  flex: 1; font-size: 11px; color: #64748b; line-height: 1.7;
+  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px;
+}
+.loop-chunk strong { color: #334155; }
+
+.footer { text-align: center; margin-top: 48px; font-size: 11px; color: #cbd5e1; }
+</style>
+</head>
+<body>
+
+<!-- 标题 & 图例 -->
+<div class="top-bar">
+  <div>
+    <div class="page-title">万能营销 · Deepflow 系统拓扑</div>
+    <div class="page-sub">数据流总线架构 · 各智能体从数据流读取、调用工具处理、输出写回数据流</div>
+  </div>
+  <div class="legend">
+    <div class="li"><div class="ld" style="background:#eff6ff;border:1px solid #bfdbfe;"></div>从数据流读取</div>
+    <div class="li"><div class="ld" style="background:#f0fdf4;border:1px solid #bbf7d0;"></div>写回数据流</div>
+    <div class="li"><div class="ld" style="background:#3b82f6;border-radius:50%;"></div>AI推进步骤</div>
+    <div class="li"><div class="ld" style="background:#94a3b8;border-radius:50%;"></div>用户执行节点</div>
+    <div class="li" style="border-left:1px solid #e2e8f0;padding-left:14px;">
+      <span style="color:#2563eb;font-weight:900;font-size:13px;line-height:1;">◄</span>内勤取数
+    </div>
+    <div class="li">
+      <span style="color:#0284c7;font-weight:900;font-size:13px;line-height:1;">►</span>外勤取数
+    </div>
+    <div class="li">
+      <span style="color:#059669;font-weight:700;font-size:12px;line-height:1;">▼</span>写回入流
+    </div>
+    <div class="li">
+      <div class="ld" style="background:#faf5ff;border:1px solid #c4b5fd;"></div>协作分支数据
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ 河道布局 ══════════════════ -->
+<div class="river-wrap">
+
+  <!-- ── 栏头 ── -->
+  <div class="lc" style="padding-bottom:4px;">
+    <div class="bank-header do" style="width:100%;max-width:400px;">平安DO &nbsp;·&nbsp; 内勤</div>
+  </div>
+  <div class="rv" style="padding:8px 10px 4px;">
+    <div class="rv-title">数&nbsp;据&nbsp;流</div>
+  </div>
+  <div class="rc" style="padding-bottom:4px;">
+    <div class="bank-header pocket" style="width:100%;max-width:400px;">口袋E &nbsp;·&nbsp; 外勤</div>
+  </div>
+
+  <!-- ── 起点：NBEV目标进入数据流 ── -->
+  <div class="lc empty-cell" style="min-height:60px;"></div>
+  <div class="rv">
+    <div class="r-entry">📥 NBEV目标 进入数据流</div>
+    <div class="r-dir">总部下发</div>
+    <div class="r-seg"></div>
+    <div class="r-chip"><span class="arr-l">◄</span>NBEV目标</div>
+    <div class="r-seg"></div>
+  </div>
+  <div class="rc empty-cell"></div>
+
+  <!-- ══ ① 营销规划智能体 ══ -->
+  <div class="lc">
+    <div class="ac" style="border-left:3px solid #2563eb;">
+      <div class="ac-head">
+        <div class="ac-icon" style="background:#eff6ff;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <div>
+          <div class="ac-name">① 营销规划智能体</div>
+          <span class="ac-tag tag-do">平安DO · 内勤</span>
+        </div>
+      </div>
+      <div class="ac-io">
+        <div class="ac-row">
+          <span class="ac-lbl">读取</span>
+          <span class="io-in">NBEV目标</span>
+        </div>
+        <div class="ac-row">
+          <span class="ac-lbl">工具</span>
+          <span class="io-tool">目标拆解</span>
+          <span class="io-tool">达成路径规划</span>
+        </div>
+        <div class="ac-row">
+          <span class="ac-lbl">写回</span>
+          <span class="io-out">面谈对象&主题</span>
+          <span class="io-out">主推/次推产品</span>
+          <span class="io-out">1vN活动计划</span>
+        </div>
+      </div>
+      <div class="step-row">
+        <span class="sf-lbl">Deepflow</span>
+        <span class="sp ai">AI推送目标</span><span class="sa">›</span>
+        <span class="sp usr">内勤确认</span><span class="sa">›</span>
+        <span class="sp ai">AI拆解规划</span><span class="sa">›</span>
+        <span class="sp usr">确认名单</span><span class="sa">›</span>
+        <span class="sp auto">写回数据流</span>
+      </div>
+    </div>
+  </div>
+  <div class="rv">
+    <div class="r-dir left">← ① 内勤取数</div>
+    <div class="r-seg"></div>
+    <div class="r-dir">⬇ ① 写回入流</div>
+    <div class="r-out"><span class="arr-w">▼</span>面谈对象&主题</div>
+    <div class="r-out"><span class="arr-w">▼</span>主推/次推产品</div>
+    <div class="r-out"><span class="arr-w">▼</span>1vN活动计划</div>
+    <div class="r-seg"></div>
+    <div class="r-inflow">已入流 · 可被读取</div>
+    <div class="r-chip new"><span class="arr-l">◄</span>面谈对象&主题<span class="arr-r">►</span></div>
+    <div class="r-chip new">1vN活动计划<span class="arr-r">►</span></div>
+    <div class="r-seg"></div>
+  </div>
+  <div class="rc empty-cell"></div>
+
+  <!-- ══ ② 追踪管理·面谈辅助 ══ -->
+  <div class="lc">
+    <div class="ac" style="border-left:3px solid #2563eb;">
+      <div class="ac-head">
+        <div class="ac-icon" style="background:#eff6ff;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div>
+          <div class="ac-name">② 追踪管理 · 面谈辅助</div>
+          <span class="ac-tag tag-do">平安DO · 内勤</span>
+          <span style="font-size:9px;color:#94a3b8;background:#f8fafc;border:1px solid #e2e8f0;border-radius:3px;padding:0 4px;margin-left:3px;">面谈级别高</span>
+        </div>
+      </div>
+      <div class="ac-io">
+        <div class="ac-row">
+          <span class="ac-lbl">读取</span>
+          <span class="io-in">面谈对象&主题</span>
+        </div>
+        <div class="ac-row">
+          <span class="ac-lbl">工具</span>
+          <span class="io-tool">面谈辅助</span>
+        </div>
+        <div class="ac-row">
+          <span class="ac-lbl">写回</span>
+          <span class="io-out">代理人FYC目标</span>
+          <span class="io-out">件数目标</span>
+        </div>
+      </div>
+      <div class="step-row">
+        <span class="sf-lbl">Deepflow</span>
+        <span class="sp ai">AI筛选名单</span><span class="sa">›</span>
+        <span class="sp usr">确认对象</span><span class="sa">›</span>
+        <span class="sp ai">生成材料</span><span class="sa">›</span>
+        <span class="sp usr">执行面谈</span><span class="sa">›</span>
+        <span class="sp auto">AI归档写回</span>
+      </div>
+    </div>
+  </div>
+  <div class="rv">
+    <div class="r-dir both">← ② 内勤 &nbsp;|&nbsp; 外勤 ② →</div>
+    <div style="font-size:9px;color:#94a3b8;text-align:center;margin:2px 0;">同时取数：面谈对象&主题</div>
+    <div class="r-seg"></div>
+    <div class="r-dir">⬇ ② 写回入流</div>
+    <div class="r-out"><span class="arr-w">▼</span>代理人FYC目标</div>
+    <div class="r-out"><span class="arr-w">▼</span>件数目标</div>
+    <div class="r-seg"></div>
+    <div class="r-inflow">已入流 · 可被读取</div>
+    <div class="r-chip new">代理人FYC目标<span class="arr-r">►</span></div>
+    <div class="r-chip new">件数目标<span class="arr-r">►</span></div>
+    <div class="r-seg"></div>
+  </div>
+  <div class="rc">
+    <div class="ac" style="border-left:3px solid #0284c7;">
+      <div class="ac-head">
+        <div class="ac-icon" style="background:#f0f9ff;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div>
+          <div class="ac-name">② 追踪管理 · 面谈辅助</div>
+          <span class="ac-tag tag-pocket">口袋E · 外勤</span>
+          <span style="font-size:9px;color:#94a3b8;background:#f8fafc;border:1px solid #e2e8f0;border-radius:3px;padding:0 4px;margin-left:3px;">面谈级别低</span>
+        </div>
+      </div>
+      <div class="ac-io">
+        <div class="ac-row">
+          <span class="ac-lbl">读取</span>
+          <span class="io-in">面谈对象&主题</span>
+          <span class="io-in">活动计划</span>
+        </div>
+        <div class="ac-row">
+          <span class="ac-lbl">工具</span>
+          <span class="io-tool">面谈辅助</span>
+        </div>
+        <div class="ac-row">
+          <span class="ac-lbl">写回</span>
+          <span class="io-out">代理人FYC目标</span>
+          <span class="io-out">件数目标</span>
+        </div>
+      </div>
+      <div class="step-row">
+        <span class="sf-lbl">Deepflow</span>
+        <span class="sp ai">AI推送任务</span><span class="sa">›</span>
+        <span class="sp usr">代理人执行</span><span class="sa">›</span>
+        <span class="sp auto">AI归档写回</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ③ 客户经营（外勤读取，主流 + 协作分支） ══ -->
+  <div class="lc empty-cell"></div>
+  <div class="rv">
+    <div class="r-dir right">③ 外勤取数 →</div>
+    <div style="font-size:9px;color:#94a3b8;text-align:center;margin:2px 0;">取：FYC/件数目标 · 活动计划</div>
+    <div class="r-seg"></div>
+
+    <!-- 主流写回 -->
+    <div class="r-dir">⬇ ③ 写回入流（主流）</div>
+    <div class="r-out"><span class="arr-w">▼</span>客户经营数据</div>
+    <div class="r-out"><span class="arr-w">▼</span>代理人业绩数据</div>
+    <div class="r-seg"></div>
+    <div class="r-inflow">已入流 · 可被读取</div>
+    <div class="r-chip new"><span class="arr-l">◄</span>客户经营数据</div>
+    <div class="r-chip new"><span class="arr-l">◄</span>代理人业绩数据</div>
+    <div class="r-seg"></div>
+
+    <!-- 协作分支写回 -->
+    <div class="r-sub-header">⬇ ③ 协作分支 → ④⑤</div>
+    <div class="r-out sub"><span class="arr-ws">▼</span>客户保障需求</div>
+    <div class="r-out sub"><span class="arr-ws">▼</span>代理人培训需求</div>
+    <div class="r-seg sub"></div>
+    <div class="r-inflow sub">协作数据 · 外勤取数</div>
+    <div class="r-chip sub">客户保障需求<span style="color:#7c3aed;font-size:10px;font-weight:900;margin-left:2px;">►</span></div>
+    <div class="r-chip sub">代理人培训需求<span style="color:#7c3aed;font-size:10px;font-weight:900;margin-left:2px;">►</span></div>
+    <div class="r-seg sub"></div>
+  </div>
+  <div class="rc">
+    <div class="ac" style="border-left:3px solid #0284c7;">
+      <div class="ac-head">
+        <div class="ac-icon" style="background:#f0f9ff;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+        <div>
+          <div class="ac-name">③ 客户经营智能体</div>
+          <span class="ac-tag tag-pocket">口袋E · 外勤</span>
+        </div>
+      </div>
+      <div class="ac-io">
+        <div class="ac-row">
+          <span class="ac-lbl">读取</span>
+          <span class="io-in">FYC/件数目标</span>
+          <span class="io-in">活动计划</span>
+        </div>
+        <div class="ac-row">
+          <span class="ac-lbl">工具</span>
+          <span class="io-tool">盘客/圈客</span>
+          <span class="io-tool">邀约客户</span>
+          <span class="io-tool">拜访客户</span>
+        </div>
+        <div class="ac-row">
+          <span class="ac-lbl">写回</span>
+          <span class="io-out">客户经营数据</span>
+          <span class="io-out">代理人业绩数据</span>
+        </div>
+        <div class="ac-row" style="margin-top:4px;border-top:1px dashed #f1f5f9;padding-top:5px;">
+          <span class="ac-lbl" style="color:#a78bfa;">分支写</span>
+          <span class="io-out sub">客户保障需求 → ④</span>
+          <span class="io-out sub">代理人培训需求 → ⑤</span>
+        </div>
+      </div>
+      <div class="step-row">
+        <span class="sf-lbl">Deepflow</span>
+        <span class="sp ai">AI推任务</span><span class="sa">›</span>
+        <span class="sp usr">盘客/圈客</span><span class="sa">›</span>
+        <span class="sp usr">邀约/拜访</span><span class="sa">›</span>
+        <span class="sp auto">AI写回数据流</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ④ 产品销售 + ⑤ 问答陪练（协作分支，独立数据流行）══ -->
+  <div class="lc empty-cell"></div>
+  <div class="rv">
+    <div class="r-dir sub" style="font-size:9px;">④⑤ 外勤取数 →</div>
+    <div style="font-size:9px;color:#a78bfa;text-align:center;margin:2px 0;">取：客户保障需求 · 代理人培训需求</div>
+    <div class="r-seg sub"></div>
+    <div class="r-sub-header">⬇ ④⑤ 写回入流</div>
+    <div class="r-out sub"><span class="arr-ws">▼</span>客户保障测算结果</div>
+    <div class="r-out sub"><span class="arr-ws">▼</span>代理人培训数据</div>
+    <div class="r-seg sub"></div>
+    <div class="r-inflow sub">协作结果 · 已入流</div>
+    <div class="r-chip sub">客户保障测算结果</div>
+    <div class="r-chip sub">代理人培训数据</div>
+    <div class="r-seg sub"></div>
+  </div>
+  <div class="rc">
+    <div style="display:flex;flex-direction:column;gap:8px;width:100%;max-width:400px;">
+
+      <!-- ④ 产品销售智能体 -->
+      <div class="ac" style="border-left:3px solid #7c3aed;">
+        <div class="ac-head">
+          <div class="ac-icon" style="background:#f5f3ff;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <div>
+            <div class="ac-name">④ 产品销售智能体</div>
+            <span class="ac-tag tag-collab">口袋E · 外勤</span>
+          </div>
+        </div>
+        <div class="ac-io">
+          <div class="ac-row">
+            <span class="ac-lbl">读取</span>
+            <span class="io-in">客户保障需求</span>
+          </div>
+          <div class="ac-row">
+            <span class="ac-lbl">工具</span>
+            <span class="io-tool collab">保障测算</span>
+          </div>
+          <div class="ac-row">
+            <span class="ac-lbl">写回</span>
+            <span class="io-out sub">保障测算结果</span>
+          </div>
+        </div>
+        <div class="step-row">
+          <span class="sf-lbl">Deepflow</span>
+          <span class="sp ai">AI推方案</span><span class="sa">›</span>
+          <span class="sp usr">外勤呈现</span><span class="sa">›</span>
+          <span class="sp auto">AI写回</span>
+        </div>
+      </div>
+
+      <!-- ⑤ 问答陪练智能体 -->
+      <div class="ac" style="border-left:3px solid #7c3aed;">
+        <div class="ac-head">
+          <div class="ac-icon" style="background:#f5f3ff;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div>
+            <div class="ac-name">⑤ 问答陪练智能体</div>
+            <span class="ac-tag tag-collab">口袋E · 外勤</span>
+          </div>
+        </div>
+        <div class="ac-io">
+          <div class="ac-row">
+            <span class="ac-lbl">读取</span>
+            <span class="io-in">代理人培训需求</span>
+          </div>
+          <div class="ac-row">
+            <span class="ac-lbl">工具</span>
+            <span class="io-tool collab">问答陪练</span>
+          </div>
+          <div class="ac-row">
+            <span class="ac-lbl">写回</span>
+            <span class="io-out sub">代理人培训数据</span>
+          </div>
+        </div>
+        <div class="step-row">
+          <span class="sf-lbl">Deepflow</span>
+          <span class="sp ai">AI推练习</span><span class="sa">›</span>
+          <span class="sp usr">代理人作答</span><span class="sa">›</span>
+          <span class="sp auto">AI评分写回</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ ⑥ 业绩追踪（内勤 + 外勤同时读取） ══ -->
+  <div class="lc">
+    <div class="ac" style="border-left:3px solid #2563eb;">
+      <div class="ac-head">
+        <div class="ac-icon" style="background:#eff6ff;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div>
+          <div class="ac-name">⑥ 追踪管理 · 业绩追踪</div>
+          <span class="ac-tag tag-do">平安DO · 内勤</span>
+        </div>
+      </div>
+      <div class="ac-io">
+        <div class="ac-row">
+          <span class="ac-lbl">读取</span>
+          <span class="io-in">客户经营数据</span>
+          <span class="io-in">代理人业绩数据</span>
+        </div>
+        <div class="ac-row">
+          <span class="ac-lbl">工具</span>
+          <span class="io-tool">目标预警</span>
+          <span class="io-tool">根因分析</span>
+          <span class="io-tool">改进举措</span>
+        </div>
+        <div class="ac-row">
+          <span class="ac-lbl">写回</span>
+          <span class="io-out">下一轮面谈名单</span>
+          <span class="io-out">表彰对象</span>
+        </div>
+      </div>
+      <div class="step-row">
+        <span class="sf-lbl">Deepflow</span>
+        <span class="sp ai">AI检测预警</span><span class="sa">›</span>
+        <span class="sp ai">根因分析</span><span class="sa">›</span>
+        <span class="sp usr">内勤确认举措</span><span class="sa">›</span>
+        <span class="sp auto">写回数据流</span>
+      </div>
+    </div>
+  </div>
+  <div class="rv">
+    <div class="r-dir both">← ⑥ 内勤 &nbsp;|&nbsp; 外勤 ⑥ →</div>
+    <div style="font-size:9px;color:#94a3b8;text-align:center;margin:2px 0;">同时取数：业绩数据</div>
+    <div class="r-seg"></div>
+    <div class="r-dir">⬇ ⑥ 写回入流</div>
+    <div class="r-out"><span class="arr-w">▼</span>下一轮面谈名单</div>
+    <div class="r-out"><span class="arr-w">▼</span>表彰对象</div>
+    <div class="r-seg"></div>
+    <div class="r-inflow">已入流 · 可被读取</div>
+    <div class="r-chip new"><span class="arr-l">◄</span>下一轮面谈名单<span class="arr-r">►</span></div>
+    <div class="r-chip new"><span class="arr-l">◄</span>表彰对象</div>
+    <div class="r-seg"></div>
+  </div>
+  <div class="rc">
+    <div class="ac" style="border-left:3px solid #0284c7;">
+      <div class="ac-head">
+        <div class="ac-icon" style="background:#f0f9ff;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div>
+          <div class="ac-name">⑥ 追踪管理 · 业绩追踪</div>
+          <span class="ac-tag tag-pocket">口袋E · 外勤</span>
+        </div>
+      </div>
+      <div class="ac-io">
+        <div class="ac-row">
+          <span class="ac-lbl">读取</span>
+          <span class="io-in">本人业绩数据</span>
+          <span class="io-in">FYC/件数目标</span>
+        </div>
+        <div class="ac-row">
+          <span class="ac-lbl">工具</span>
+          <span class="io-tool">目标预警</span>
+          <span class="io-tool">根因分析</span>
+          <span class="io-tool">改进举措</span>
+        </div>
+        <div class="ac-row">
+          <span class="ac-lbl">写回</span>
+          <span class="io-out">个人业绩进度</span>
+          <span class="io-out">改进行动建议</span>
+        </div>
+      </div>
+      <div class="step-row">
+        <span class="sf-lbl">Deepflow</span>
+        <span class="sp ai">AI推送预警</span><span class="sa">›</span>
+        <span class="sp usr">查看进度</span><span class="sa">›</span>
+        <span class="sp auto">AI生成建议</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ⑦ 内容创作（内勤读取表彰对象） ══ -->
+  <div class="lc">
+    <div class="ac" style="border-left:3px solid #2563eb;">
+      <div class="ac-head">
+        <div class="ac-icon" style="background:#eff6ff;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="14 2 14 8 20 8"/><path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8l6 6z"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <div>
+          <div class="ac-name">⑦ 内容创作智能体</div>
+          <span class="ac-tag tag-do">平安DO · 内勤</span>
+        </div>
+      </div>
+      <div class="ac-io">
+        <div class="ac-row">
+          <span class="ac-lbl">读取</span>
+          <span class="io-in">表彰对象</span>
+        </div>
+        <div class="ac-row">
+          <span class="ac-lbl">工具</span>
+          <span class="io-tool">贺报工具</span>
+          <span class="io-tool">案例工具</span>
+        </div>
+        <div class="ac-row">
+          <span class="ac-lbl">写回</span>
+          <span class="io-out">贺报</span>
+          <span class="io-out">案例</span>
+        </div>
+      </div>
+      <div class="step-row">
+        <span class="sf-lbl">Deepflow</span>
+        <span class="sp ai">AI生成贺报/案例</span><span class="sa">›</span>
+        <span class="sp usr">内勤审核</span><span class="sa">›</span>
+        <span class="sp auto">发布写回</span>
+      </div>
+    </div>
+  </div>
+  <div class="rv">
+    <div class="r-dir left">← ⑦ 内勤取数</div>
+    <div style="font-size:9px;color:#94a3b8;text-align:center;margin:2px 0;">取：表彰对象</div>
+    <div class="r-seg"></div>
+    <div class="r-dir">⬇ ⑦ 写回入流</div>
+    <div class="r-out"><span class="arr-w">▼</span>贺报</div>
+    <div class="r-out"><span class="arr-w">▼</span>案例</div>
+    <div class="r-seg"></div>
+    <div class="r-inflow">已入流 · 对外输出</div>
+    <div class="r-chip new">贺报 · 案例</div>
+    <div class="r-seg" style="height:22px;"></div>
+    <!-- 闭环回流标识 -->
+    <div class="r-chip loop"><span class="arr-l">◄</span>↩ 下一轮面谈名单<span class="arr-r">►</span></div>
+    <div style="font-size:9px;color:#15803d;text-align:center;margin-top:2px;">流回② 追踪管理·面谈辅助</div>
+    <div class="r-seg"></div>
+  </div>
+  <div class="rc empty-cell"></div>
+
+</div><!-- end river-wrap -->
+
+<!-- ══ 数据流闭环说明 ══ -->
+<div style="max-width:1100px;margin:16px auto 0;">
+  <div class="loop-section">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-8.5"/></svg>
+      <div style="font-size:9px;font-weight:700;color:#94a3b8;letter-spacing:1px;white-space:nowrap;">闭环</div>
+    </div>
+    <div class="loop-chunk">
+      <strong>协作分支流：</strong>③客户经营在拜访过程中产生「客户保障需求」→ ④产品销售读取并测算，写回「保障测算结果」；产生「代理人培训需求」→ ⑤问答陪练读取并训练，写回「代理人培训数据」。两条协作分支均在外勤侧完成闭环，结果最终汇入「客户经营数据」。
+    </div>
+    <div class="loop-chunk">
+      <strong>主流闭环：</strong>⑥业绩追踪写回的「下一轮面谈名单」重新进入数据流 → ②面谈辅助读取 → 新一轮 Deepflow 启动。<strong>AI 主动推进</strong>每个节点，用户只在关键步骤执行，处理结果<strong>自动写回数据流</strong>触发下游，无需人工跳转。
+    </div>
+  </div>
+</div>
+
+<div class="footer">万能营销 Deepflow 拓扑图 · 数据来源 Deepflow.xlsx · 2026年5月16日</div>
+
+</body>
+</html>

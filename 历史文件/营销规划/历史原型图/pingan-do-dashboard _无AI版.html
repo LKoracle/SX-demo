@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>平安DO - 首页</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", sans-serif;
+    background: #f0f2f5;
+    color: #333;
+    font-size: 14px;
+    min-width: 1200px;
+  }
+
+  /* ===== TOP NAV ===== */
+  .top-nav {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    height: 48px;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 8px; margin-right: 32px; }
+  .nav-logo-icon {
+    width: 28px; height: 28px; background: #fff; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; color: #1a1a2e; font-size: 16px;
+  }
+  .nav-logo-text { font-size: 16px; font-weight: 600; letter-spacing: 1px; }
+  .nav-logo-sub { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: -2px; }
+  .nav-menu { display: flex; flex: 1; }
+  .nav-menu a {
+    color: rgba(255,255,255,0.85); text-decoration: none;
+    padding: 0 16px; height: 48px;
+    display: flex; align-items: center; font-size: 14px;
+    transition: all 0.2s; position: relative;
+  }
+  .nav-menu a:hover, .nav-menu a.active { color: #fff; background: rgba(255,255,255,0.1); }
+  .nav-menu a.active::after {
+    content: ''; position: absolute; bottom: 0; left: 16px; right: 16px;
+    height: 2px; background: #4fc3f7;
+  }
+  .nav-right { display: flex; align-items: center; gap: 16px; color: rgba(255,255,255,0.7); }
+  .nav-right-icon { width: 20px; height: 20px; cursor: pointer; opacity: 0.7; }
+  .nav-avatar { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .nav-avatar-circle {
+    width: 28px; height: 28px; border-radius: 50%; background: #4fc3f7;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ===== BANNER: simple gradient, no images ===== */
+  .banner {
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 160px;
+    background: linear-gradient(to right, #4dbce9 0%, #7aceed 25%, #a3def3 50%, #c8ebf7 75%, #e8f4fb 100%);
+    border-radius: 4px;
+  }
+  .banner-outer {
+    width: 100%;
+    background: #f0f2f5;
+    padding: 16px 0 0 0;
+  }
+
+  /* ===== PAGE LAYOUT ===== */
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+
+  .location-row {
+    display: flex; align-items: center;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #e8e8e8;
+    margin-bottom: 16px;
+  }
+  .location-icon { color: #1976d2; margin-right: 4px; font-size: 14px; }
+  .location-text { color: #1976d2; font-size: 14px; font-weight: 500; }
+  .location-right { margin-left: auto; }
+  .tab-item { color: #1976d2; cursor: pointer; padding: 4px 0; font-size: 14px; }
+
+  /* ===== MAIN 2-COLUMN ===== */
+  .main-body {
+    display: flex; gap: 16px; padding: 16px 0; background: #f0f2f5;
+    align-items: stretch;
+  }
+
+  /* LEFT CARD */
+  .left-card {
+    flex: 1; background: #fff; border-radius: 4px; padding: 20px;
+    display: flex; flex-direction: column;
+  }
+
+  .kpi-row { display: flex; align-items: center; gap: 40px; margin-bottom: 4px; }
+  .kpi-item { display: flex; flex-direction: column; gap: 4px; }
+  .kpi-label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #666; }
+  .kpi-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .kpi-dot.orange { background: #f5a623; }
+  .kpi-dot.green { background: #4caf50; }
+  .kpi-value { font-size: 13px; color: #999; padding-left: 14px; }
+
+  .filter-btn {
+    padding: 4px 12px; border: 1px solid #d9d9d9; border-radius: 4px;
+    font-size: 12px; color: #666; background: #fff; cursor: pointer;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .filter-btn::after { content: '▾'; font-size: 10px; }
+
+  .chart-area { position: relative; height: 200px; margin: 12px 0; }
+  .chart-x-axis {
+    display: flex; justify-content: space-between;
+    padding: 8px 0 14px 0; color: #999; font-size: 12px;
+    border-bottom: 1px solid #e8e8e8;
+  }
+
+  /* HR section */
+  .hr-section { margin-top: 16px; padding-top: 14px; }
+  .hr-grid { display: flex; align-items: stretch; }
+  .hr-col { display: flex; flex-direction: column; gap: 10px; }
+  .hr-col-current {
+    min-width: 120px; padding-right: 24px;
+    border-right: 1px solid #e0e0e0;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
+  }
+  .hr-label-row { display: flex; align-items: center; gap: 6px; }
+  .hr-dot { width: 8px; height: 8px; border-radius: 50%; background: #1976d2; flex-shrink: 0; }
+  .hr-label-blue { font-size: 13px; color: #1976d2; }
+  .hr-value-right { font-size: 13px; color: #666; text-align: right; }
+  .hr-col-mid {
+    min-width: 130px; padding-left: 24px; padding-right: 24px;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+  }
+  .hr-col-rate {
+    min-width: 110px; padding-left: 10px;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+  }
+  .hr-text { font-size: 13px; color: #666; }
+
+  /* Bottom split: 2/3 + 1/3 */
+  .bottom-split {
+    display: flex; gap: 0; margin-top: 20px;
+    border-top: 1px solid #f0f0f0; padding-top: 16px; flex: 1;
+  }
+  .bottom-left { flex: 2; padding-right: 20px; border-right: 1px solid #f0f0f0; }
+  .bottom-right {
+    flex: 1; padding-left: 20px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+
+  .chart-tabs-row { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+  .chart-tab-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .chart-tab-dot.blue { background: #1976d2; }
+  .chart-tab-dot.orange2 { background: #f5a623; }
+  .chart-tab-label { font-size: 13px; color: #666; }
+
+  .monthly-chart { height: 150px; position: relative; margin: 8px 0; }
+  .month-axis {
+    display: flex; justify-content: space-between;
+    color: #999; font-size: 12px; padding: 6px 0;
+  }
+  .chart-note { font-size: 11px; color: #999; margin-top: 6px; }
+
+  /* RIGHT COLUMN */
+  .right-col {
+    width: 300px; flex-shrink: 0;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .right-card-top, .right-card-bottom {
+    background: #fff; border-radius: 4px; padding: 20px;
+  }
+  .right-card-bottom {
+    flex: 1;
+  }
+  .right-title {
+    font-size: 16px; font-weight: 600; color: #333;
+    padding-bottom: 14px; border-bottom: 1px solid #f0f0f0; margin-bottom: 16px;
+  }
+  .quick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px 28px; }
+  .quick-item {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 8px; cursor: pointer; transition: transform 0.2s;
+  }
+  .quick-item:hover { transform: translateY(-2px); }
+  .quick-icon {
+    width: 44px; height: 44px; border-radius: 8px; background: #f0f5ff;
+    display: flex; align-items: center; justify-content: center; color: #1976d2;
+  }
+  .quick-label { font-size: 12px; color: #666; text-align: center; white-space: nowrap; }
+
+  /* Right bottom card: blank with matching title bar */
+  .right-card-bottom-bar {
+    height: 14px;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 14px;
+  }
+
+  .footer {
+    background: #fff; padding: 16px 0; border-top: 1px solid #e8e8e8;
+    display: flex; justify-content: center; gap: 40px; color: #666; font-size: 13px;
+  }
+  .footer a { color: #666; text-decoration: none; cursor: pointer; }
+  .footer a:hover { color: #1976d2; }
+
+  .chart-svg { width: 100%; height: 100%; }
+  .grid-line { stroke: #f0f0f0; stroke-width: 1; }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <div class="nav-logo">
+    <div class="nav-logo-icon">D</div>
+    <div>
+      <div class="nav-logo-text">平安DO</div>
+      <div class="nav-logo-sub">前线内勤平台 (三级机构用户)</div>
+    </div>
+  </div>
+  <div class="nav-menu">
+    <a href="#" class="active">首页</a>
+    <a href="#">智慧客经平台</a>
+    <a href="#">人发管理</a>
+    <a href="#">产能管理</a>
+    <a href="#">日常管理</a>
+    <a href="#">产品板块</a>
+    <a href="#">平台管理</a>
+  </div>
+  <div class="nav-right">
+    <svg class="nav-right-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v1m0 16v1m-9-9h1m16 0h1m-2.636-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707"/><circle cx="12" cy="12" r="4"/></svg>
+    <svg class="nav-right-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    <div class="nav-avatar">
+      <div class="nav-avatar-circle">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg>
+      </div>
+      <span style="font-size:13px;color:rgba(255,255,255,0.8)">李平安 ▾</span>
+    </div>
+  </div>
+</nav>
+
+<!-- BANNER -->
+<div class="banner-outer">
+  <div class="banner"></div>
+</div>
+
+<div class="page-container">
+  <!-- MAIN BODY -->
+  <div class="main-body">
+
+    <!-- ========== LEFT CARD ========== -->
+    <div class="left-card">
+      <!-- Location row inside left card -->
+      <div class="location-row">
+        <span class="location-icon">📍</span>
+        <span class="location-text">浙江温州市</span>
+        <div class="location-right">
+          <span class="tab-item">个险</span>
+        </div>
+      </div>
+
+      <!-- KPI + 筛选 -->
+      <div class="kpi-row">
+        <div class="kpi-item">
+          <div class="kpi-label"><span class="kpi-dot orange"></span> FYP</div>
+          <div class="kpi-value">- 万元</div>
+        </div>
+        <div class="kpi-item">
+          <div class="kpi-label"><span class="kpi-dot green"></span> NBEV</div>
+          <div class="kpi-value">- 万元</div>
+        </div>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:20px;">
+          <div class="filter-btn">筛选</div>
+        </div>
+      </div>
+
+      <!-- Line Chart -->
+      <div class="chart-area">
+        <svg class="chart-svg" viewBox="0 0 600 180">
+          <line x1="0" y1="36" x2="600" y2="36" class="grid-line" stroke-dasharray="3,3"/>
+          <line x1="0" y1="72" x2="600" y2="72" class="grid-line" stroke-dasharray="3,3"/>
+          <line x1="0" y1="108" x2="600" y2="108" class="grid-line" stroke-dasharray="3,3"/>
+          <line x1="0" y1="144" x2="600" y2="144" class="grid-line" stroke-dasharray="3,3"/>
+          <line x1="0" y1="175" x2="600" y2="175" stroke="#e0e0e0" stroke-width="1"/>
+        </svg>
+      </div>
+      <div class="chart-x-axis">
+        <span>4月1日</span><span>4月5日</span><span>4月10日</span><span>4月15日</span><span>4月20日</span><span>4月25日</span><span>4月30日</span>
+      </div>
+
+      <!-- HR 3-col -->
+      <div class="hr-section">
+        <div class="hr-grid">
+          <div class="hr-col hr-col-current">
+            <div class="hr-label-row"><span class="hr-dot"></span><span class="hr-label-blue">当前人力</span></div>
+            <div class="hr-value-right">- 人</div>
+          </div>
+          <div class="hr-col hr-col-mid">
+            <div class="hr-text">新增人力: -人</div>
+            <div class="hr-text">脱落人力: -人</div>
+          </div>
+          <div class="hr-col hr-col-rate">
+            <div class="hr-text">增员率: 0%</div>
+            <div class="hr-text">脱落率: 0%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM SPLIT: 2/3 chart | 1/3 radar -->
+      <div class="bottom-split">
+        <!-- LEFT 2/3 -->
+        <div class="bottom-left">
+          <div class="chart-tabs-row">
+            <div style="display:flex;align-items:center;gap:4px;">
+              <span class="chart-tab-dot blue"></span>
+              <span class="chart-tab-label">当月数据</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;">
+              <span class="chart-tab-dot orange2"></span>
+              <span class="chart-tab-label">去年同期</span>
+            </div>
+            <div style="margin-left:auto;">
+              <div class="filter-btn">图表</div>
+            </div>
+          </div>
+          <div class="monthly-chart">
+            <svg class="chart-svg" viewBox="0 0 500 130">
+              <line x1="0" y1="26" x2="500" y2="26" class="grid-line" stroke-dasharray="3,3"/>
+              <line x1="0" y1="52" x2="500" y2="52" class="grid-line" stroke-dasharray="3,3"/>
+              <line x1="0" y1="78" x2="500" y2="78" class="grid-line" stroke-dasharray="3,3"/>
+              <line x1="0" y1="104" x2="500" y2="104" class="grid-line" stroke-dasharray="3,3"/>
+              <line x1="0" y1="125" x2="500" y2="125" stroke="#e0e0e0" stroke-width="1"/>
+            </svg>
+          </div>
+          <div class="month-axis">
+            <span>1月</span><span>2月</span><span>3月</span><span>4月</span><span>5月</span><span>6月</span>
+            <span>7月</span><span>8月</span><span>9月</span><span>10月</span><span>11月</span><span>12月</span>
+          </div>
+          <div class="chart-note">注: 当前/新增/脱落人力更新于半小时前</div>
+        </div>
+
+        <!-- RIGHT 1/3: radar -->
+        <div class="bottom-right">
+          <!-- Tabs above radar -->
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;width:100%;font-size:12px;color:#666;">
+            <div style="display:flex;align-items:center;gap:3px;">
+              <span class="chart-tab-dot blue" style="width:6px;height:6px;"></span>
+              <span>当月数据</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:3px;">
+              <span class="chart-tab-dot orange2" style="width:6px;height:6px;"></span>
+              <span>去年同期</span>
+            </div>
+            <div style="margin-left:auto;">
+              <span style="border:1px solid #d9d9d9;border-radius:3px;padding:2px 8px;font-size:11px;cursor:pointer;">图表 ▾</span>
+            </div>
+          </div>
+
+          <!-- Radar -->
+          <svg width="220" height="190" viewBox="0 0 220 190" style="margin:0 auto;">
+            <g transform="translate(110,90)">
+              <polygon points="0,-65  62,-20  38,53  -38,53  -62,-20" fill="none" stroke="#e8e8e8" stroke-width="0.8"/>
+              <polygon points="0,-43  41,-13  25,35  -25,35  -41,-13" fill="none" stroke="#e8e8e8" stroke-width="0.6"/>
+              <polygon points="0,-22  21,-7  13,18  -13,18  -21,-7" fill="none" stroke="#e8e8e8" stroke-width="0.4"/>
+              <polygon points="0,-8  8,-3  5,7  -5,7  -8,-3" fill="rgba(200,190,160,0.15)" stroke="#d4c89a" stroke-width="1.5"/>
+            </g>
+            <text x="110" y="12" text-anchor="middle" font-size="10" fill="#999">钻石人力占比</text>
+            <text x="110" y="24" text-anchor="middle" font-size="13" fill="#999">0%</text>
+            <text x="184" y="72" text-anchor="start" font-size="10" fill="#999">钻石会员占比</text>
+            <text x="184" y="84" text-anchor="start" font-size="13" fill="#999">0%</text>
+            <text x="0" y="72" text-anchor="start" font-size="10" fill="#999">亲保有效</text>
+            <text x="0" y="83" text-anchor="start" font-size="10" fill="#999">活动率</text>
+            <text x="0" y="96" text-anchor="start" font-size="13" fill="#999">0%</text>
+          </svg>
+
+          <!-- Bottom stats -->
+          <div style="display:flex;justify-content:space-around;width:100%;margin-top:8px;text-align:center;">
+            <div>
+              <div style="font-size:11px;color:#999;">人均长险件数</div>
+              <div style="font-size:14px;color:#333;margin-top:2px;">-件</div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:#999;">长险件均FYP</div>
+              <div style="font-size:14px;color:#333;margin-top:2px;">-元</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== RIGHT COLUMN ========== -->
+    <div class="right-col">
+      <!-- Card 1: 快捷入口 -->
+      <div class="right-card-top">
+        <div class="right-title">快捷入口</div>
+        <div class="quick-grid">
+          <div class="quick-item">
+            <div class="quick-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M3 9h18"/></svg></div>
+            <div class="quick-label">展厅管理</div>
+          </div>
+          <div class="quick-item">
+            <div class="quick-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 2v4M16 2v4M2 10h20"/></svg></div>
+            <div class="quick-label">添平安系列活动</div>
+          </div>
+          <div class="quick-item">
+            <div class="quick-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2"><path d="M12 2a5 5 0 0 1 5 5c0 3-5 8-5 8s-5-5-5-8a5 5 0 0 1 5-5z"/><path d="M4 20c0-2 3.5-3 8-3s8 1 8 3"/></svg></div>
+            <div class="quick-label">医健活动</div>
+          </div>
+          <div class="quick-item">
+            <div class="quick-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/><path d="M16 11l2 2 4-4"/></svg></div>
+            <div class="quick-label">智能管家</div>
+          </div>
+          <div class="quick-item">
+            <div class="quick-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg></div>
+            <div class="quick-label">DO调研</div>
+          </div>
+          <div class="quick-item">
+            <div class="quick-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h10M7 12h10M7 17h6"/></svg></div>
+            <div class="quick-label">常用清单</div>
+          </div>
+          <div class="quick-item">
+            <div class="quick-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/><path d="M12 3v2M12 19v2"/></svg></div>
+            <div class="quick-label">报备晋升</div>
+          </div>
+          <div class="quick-item">
+            <div class="quick-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="7" r="3"/><path d="M3 19c0-3 3-5 6-5 1.5 0 2.8.4 3.8 1.2"/><path d="M14 19c0-3 2-5 5-5"/></svg></div>
+            <div class="quick-label">架构图</div>
+          </div>
+          <div class="quick-item">
+            <div class="quick-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></div>
+            <div class="quick-label">产品板块</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: blank bottom card with matching divider -->
+      <div class="right-card-bottom">
+        <div class="right-card-bottom-bar"></div>
+        <!-- intentionally blank -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <a href="#">中国平安</a>
+    <a href="#">调研通</a>
+    <a href="#">E行销网</a>
+    <a href="#">IT问题上报</a>
+    <a href="#">报表门户</a>
+  </div>
+</div>
+
+</body>
+</html>
